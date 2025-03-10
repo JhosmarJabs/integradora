@@ -4,12 +4,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import './App.css';
 import Narvar from './layouts/Narvar';
-import Inicio from './pages/Inicio';
 import Footer from './layouts/Footer';
-import Productos from './pages/Productos';
-import Servicios from './pages/Servicios.js';
-import Nosotros from './pages/Nosotros.js';
-import Contacto from './pages/Contacto.js';
+import Inicio from './pages/public/Inicioo';
+import Productos from './pages/public/Productos';
+import Servicios from './pages/public/Servicios';
+import Nosotros from './pages/public/Nosotros';
+import Contacto from './pages/public/Contacto';
 
 function App() {
     return (

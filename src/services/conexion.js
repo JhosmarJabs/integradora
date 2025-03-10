@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // URL de conexión a MongoDB. Asegúrate de reemplazar <username>, <password>, y <dbname> con tus propios valores.
-const mongoURI = 'mongodb://<username>:<password>@localhost:27017/<dbname>?authSource=admin';
+const mongoURI = 'mongodb+srv://Josmar:<db_password>@cluster0.up0ys.mongodb.net/';
 
 // Opciones de conexión
 const options = {

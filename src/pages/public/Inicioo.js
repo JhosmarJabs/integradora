@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Container, Button, Carousel } from "react-bootstrap";
-import Cards from "../components/cards"; // Componente de tarjetas
-import productos from "../services/base"; // Base de datos simulada
-import { colors } from "../styles/styles"; // Importamos los estilos de la guía
+import Cards from "../../components/CardsV"; // Componente de tarjetas
+import productos from "../../services/base"; // Base de datos simulada
+import { colors } from "../../styles/styles"; // Importamos los estilos de la guía
 
-const Inicio = () => {
+const Inicioo = () => {
   const [index, setIndex] = useState(0);
 
   const handleSelect = (selectedIndex) => {
@@ -62,4 +62,4 @@ const Inicio = () => {
   );
 };
 
-export default Inicio;
+export default Inicioo;
