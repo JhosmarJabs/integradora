@@ -3,7 +3,7 @@ import { Navbar, Container, Nav, Button, Form, FormControl } from "react-bootstr
 import { Link } from "react-router-dom";
 import { colors } from "../styles/styles"; // Importamos estilos
 
-const Narvar = () => {
+const NavbarComponent = () => {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -58,6 +58,8 @@ const Narvar = () => {
 
           {/* BOTÓN DE INICIAR SESIÓN */}
           <Button 
+            as={Link} 
+            to="/login" 
             style={{ backgroundColor: colors.primaryDark, borderColor: colors.primaryDark }} 
             className="ms-3"
           >
@@ -69,4 +71,4 @@ const Narvar = () => {
   );
 };
 
-export default Narvar;
+export default NavbarComponent;
