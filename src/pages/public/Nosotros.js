@@ -151,6 +151,21 @@ const Nosotros = () => {
         transform: 'translate(-50%, -50%) scale(1)',
       },
     },
+    policySection: {
+      padding: '40px 0',
+      backgroundColor: `rgba(${parseInt(colors.primaryLight.slice(1, 3), 16)}, ${parseInt(colors.primaryLight.slice(3, 5), 16)}, ${parseInt(colors.primaryLight.slice(5, 7), 16)}, 0.1)`,
+      marginTop: '50px',
+      borderRadius: '10px',
+    },
+    policyButton: {
+      ...buttons.secondary,
+      backgroundColor: colors.primaryDark,
+      padding: '12px 25px',
+      transition: 'all 0.3s ease',
+      margin: '0 auto',
+      display: 'block',
+      border: `2px solid ${colors.primaryDark}`,
+    },
   };
   
   const sectionStyle = {
@@ -169,6 +184,7 @@ const Nosotros = () => {
   const [hoveredFeature, setHoveredFeature] = useState(null);
   const [buttonHover, setButtonHover] = useState(false);
   const [imageHover, setImageHover] = useState(false);
+  const [policyButtonHover, setPolicyButtonHover] = useState(false);
 
   const timelineData = [
     { 
@@ -588,6 +604,42 @@ const Nosotros = () => {
         </Container>
       </div>
 
+      {/* SECCIÓN NUEVA: Políticas y Términos */}
+      <Container>
+        <div style={styles.policySection}>
+          <Row className="text-center">
+            <Col>
+              <h2 style={{
+                ...textStyles.subtitle,
+                color: colors.primaryDark,
+                marginBottom: '25px',
+              }}>
+                Políticas y Términos
+              </h2>
+              <p style={{
+                ...styles.paragraph,
+                maxWidth: '700px',
+                margin: '0 auto 30px',
+              }}>
+                Conoce nuestras políticas de privacidad, términos de servicio y garantía de productos.
+                Nos comprometemos con la transparencia y la protección de los datos de nuestros clientes.
+              </p>
+              <button
+                style={{
+                  ...styles.policyButton,
+                  backgroundColor: policyButtonHover ? colors.white : colors.primaryDark,
+                  color: policyButtonHover ? colors.primaryDark : colors.white,
+                }}
+                onMouseEnter={() => setPolicyButtonHover(true)}
+                onMouseLeave={() => setPolicyButtonHover(false)}
+              >
+                Ver Políticas
+              </button>
+            </Col>
+          </Row>
+        </div>
+      </Container>
+
       {/* CSS para efectos hover */}
       <style jsx>{`
         .hover-card:hover {
@@ -601,4 +653,3 @@ const Nosotros = () => {
 };
 
 export default Nosotros;
-
