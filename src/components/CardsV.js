@@ -1,11 +1,19 @@
 import React from "react";
 import { Card, Button, Row, Col, Container } from "react-bootstrap";
 import { colors } from "../styles/styles";
+import { useNavigate } from "react-router-dom";
 
 const CardsV = ({ items }) => {
+  const navigate = useNavigate();
+
   // Función para truncar texto
   const truncateText = (text, maxLength) => {
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+  };
+
+  // Función para manejar el clic en Ver Más
+  const handleVerMas = (id) => {
+    navigate(`/producto/${id}`);
   };
 
   return (
@@ -41,6 +49,7 @@ const CardsV = ({ items }) => {
                     borderColor: colors.accent,
                     marginTop: "auto"
                   }}
+                  onClick={() => handleVerMas(item._id)}
                 >
                   Ver Más
                 </Button>

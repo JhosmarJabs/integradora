@@ -1,6 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const CardsP = ({ productos }) => {
+    const navigate = useNavigate();
+
+    const handleVerMas = (id) => {
+        navigate(`/producto/${id}`);
+    };
+
     return (
         <div className="row g-4">
         {productos.map((producto) => (
@@ -28,7 +35,12 @@ const CardsP = ({ productos }) => {
                     ★ {producto.rating} ({producto.reviews} reseñas)
                 </p>
                 
-                <button className="btn btn-primary w-100 mt-3">Ver Mas</button>
+                <button 
+                    className="btn btn-primary w-100 mt-3"
+                    onClick={() => handleVerMas(producto._id)}
+                >
+                    Ver Más
+                </button>
                 </div>
             </div>
             </div>
