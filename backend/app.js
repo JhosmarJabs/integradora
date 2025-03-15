@@ -1,19 +1,34 @@
-import express from 'express';
-import cors from 'cors';
+require("dotenv").config(); // Cargar variables de entorno
+const mongoose = require("mongoose");
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const app = express();
+const port = process.env.PORT || 5000;
 
-// Middleware para permitir solicitudes desde el frontend
+// Middleware para JSON
+app.use(express.json());
+
+// Habilitar CORS
 app.use(cors());
-app.use(express.json()); // Para parsear JSON en las solicitudes
 
-// Ruta de ejemplo
-app.get('/api/data', (req, res) => {
-    res.json({ message: 'Hola desde el backend!' });
+// Conectar a MongoDB Atlas
+console.log("🔍 URI de conexión:", process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log("✅ Conectado a MongoDB Atlas"))
+    .catch(error => console.error("❌ Error conectando a MongoDB:", error));
+
+// Ruta básica para la raíz
+app.get('/', (req, res) => {
+    res.send('Bienvenido a la API');
 });
 
+// Rutas
+const registerRoutes = require("./routes/registerRuta");
+app.use("/register", registerRoutes);
+
 // Iniciar el servidor
-const PORT = 3001;
-app.listen(PORT, () => {
-    console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`🚀 La app está corriendo en http://localhost:${port}`);
 });

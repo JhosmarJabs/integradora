@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { IonIcon } from '@ionic/react';
 import { eyeOffOutline, eyeOutline, mailOutline, lockClosedOutline, callOutline } from 'ionicons/icons';
-import { colors } from '../../styles/styles'; // Importando colores del sistema
 import { Link } from 'react-router-dom'; // Importando Link para navegación
 
 const Login = () => {
@@ -66,7 +65,7 @@ const Login = () => {
     }
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     if (!nombre || !apellido || !telefono || !email || !password || !confirmPassword) {
       setError('Por favor, completa todos los campos.');
@@ -78,15 +77,39 @@ const Login = () => {
       setError('Debes aceptar los Términos de Servicio y la Política de Privacidad para continuar.');
       setSuccess('');
     } else {
-      // Lógica para enviar los datos al servidor
-      console.log('Registrando usuario:', nombre, apellido, telefono, email, password);
-      setError('');
-      setSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
-      // Simulación de cambio a formulario de login después de un registro exitoso
-      setTimeout(() => {
-        setIsLogin(true);
+      try {
+        const response = await fetch('http://localhost:5000/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: nombre,
+            surname: apellido,
+            phone: telefono,
+            email: email,
+            password: password,
+            role: 'user', // Puedes ajustar esto según tus necesidades
+            status: 'active' // Puedes ajustar esto según tus necesidades
+          })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setError('');
+          setSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
+          // Simulación de cambio a formulario de login después de un registro exitoso
+          setTimeout(() => {
+            setIsLogin(true);
+            setSuccess('');
+          }, 2000);
+        } else {
+          setError(data.message || 'Error al registrar el usuario. Inténtalo de nuevo.');
+          setSuccess('');
+        }
+      } catch (error) {
+        setError('Error al registrar el usuario. Inténtalo de nuevo.');
         setSuccess('');
-      }, 2000);
+      }
     }
   };
 
