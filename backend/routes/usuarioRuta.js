@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const Register = require('../models/usuarios');
+const Usuario = require('../models/usuarios');
 
 router.get('/', async (req, res) => {
     try {
-        const registers = await Register.find();
-        res.json(registers);
+        const usuario = await Usuario.find();
+        res.json(usuario);
     } catch (error) {
         res.json({ message: error });
     }
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
 
 // Nueva ruta POST para crear un registro
 router.post('/', async (req, res) => {
-    const register = new Register({
+    const usuario = new Usuario({
         email: req.body.email,
         password: req.body.password,
         name: req.body.name,
@@ -24,8 +24,8 @@ router.post('/', async (req, res) => {
     });
 
     try {
-        const savedRegister = await register.save();
-        res.json(savedRegister);
+        const savedUsuario = await usuario.save();
+        res.json(savedUsuario);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

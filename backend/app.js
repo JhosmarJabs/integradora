@@ -25,8 +25,8 @@ app.get('/', (req, res) => {
 });
 
 // Rutas
-const registerRoutes = require("./routes/registerRuta");
-app.use("/register", registerRoutes);
+const registerRoutes = require("./routes/usuarioRuta");
+app.use("/usuario", registerRoutes);
 
 const loginRoutes = require("./routes/loginRuta");
 app.use("/login", loginRoutes);

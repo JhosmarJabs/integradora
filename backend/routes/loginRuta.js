@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const Register = require('../models/usuarios'); // Usamos el mismo modelo de registro
+const Usuario = require('../models/usuarios'); // Usamos el modelo de usuario
 
 router.post('/', async (req, res) => {
     const { email, password } = req.body;
 
     try {
         // Buscar el usuario por email
-        const user = await Register.findOne({ email });
+        const user = await Usuario.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: 'Usuario no encontrado' });
         }
