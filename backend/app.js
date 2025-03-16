@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -12,6 +13,9 @@ app.use(express.json());
 
 // Habilitar CORS
 app.use(cors());
+
+//servidor de archivos estáticos desde la caperta 'uploads'
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Conectar a MongoDB Atlas
 console.log("🔍 URI de conexión:", process.env.MONGODB_URI);

@@ -44,6 +44,17 @@ const productoSchema = new mongoose.Schema({
     warranty: {
         type: String,
         required: true,
+    },
+    availability: {
+        type: String,
+        required: true,
+    },
+    specs: {
+        material: String,
+        conectividad: String,
+        batería: String,
+        motorización: String,
+        resistencia: String,
     }
 });
 
