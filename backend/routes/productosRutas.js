@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Ruta para agregar un nuevo producto (opcional, para inicializar la base de datos)
+// Ruta para agregar un nuevo producto
 router.post('/', async (req, res) => {
     const producto = new Producto(req.body);
     try {
