@@ -28,6 +28,15 @@ app.get('/', (req, res) => {
 const registerRoutes = require("./routes/registerRuta");
 app.use("/register", registerRoutes);
 
+const loginRoutes = require("./routes/loginRuta");
+app.use("/login", loginRoutes);
+
+const productosRoutes = require("./routes/productosRutas");
+app.use("/productos", productosRoutes);
+
+const contactoRoutes = require("./routes/contactoRuta");
+app.use("/contacto", contactoRoutes);
+
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`🚀 La app está corriendo en http://localhost:${port}`);
