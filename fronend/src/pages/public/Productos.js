@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import productos from "../../services/base"; // Importar la lista de productos
-import CardsP from "../../components/CardsP"; // Importar las tarjetas
-import { colors, textStyles, buttons } from "../../styles/styles"; // Importando estilos del sistema
+ // Importar la lista de productos
+import { colors, textStyles} from "../../styles/styles"; // Importando estilos del sistema
 import "bootstrap/dist/css/bootstrap.min.css"; // Importar Bootstrap
 import "bootstrap-icons/font/bootstrap-icons.min.css"; // Importar Bootstrap Icons
 
@@ -19,11 +18,32 @@ const Productos = () => {
   // Estado para controlar si el panel de filtros está expandido
   const [filtrosExpandidos, setFiltrosExpandidos] = useState(false);
   // Estado para productos filtrados
-  const [productosFiltrados, setProductosFiltrados] = useState(productos);
+  const [productosFiltrados, setProductosFiltrados] = useState([]);
   // Estado para contador de filtros activos
   const [filtrosActivos, setFiltrosActivos] = useState(0);
   // Estado para vista de cuadrícula o lista
   const [vistaGrilla, setVistaGrilla] = useState(true);
+  //Estado para almacenar los productos desde la API
+  const [productos, setProductos] = useState([]);
+
+    // Obtener los productos desde MongoDB al cargar el componente
+    useEffect(() => {
+      const fetchProductos = async () => {
+        try {
+          const response = await fetch('http://localhost:5000/productos'); // Ajusta la URL según tu configuración
+          if (!response.ok) {
+            throw new Error("Error al obtener los productos");
+          }
+          const data = await response.json();
+          setProductos(data);
+          setProductosFiltrados(data);
+        } catch (error) {
+          console.error("Error al obtener los productos:", error);
+        }
+      };
+  
+      fetchProductos();
+    }, []);
 
   const handleChange = (e) => {
     setFiltros({ ...filtros, [e.target.name]: e.target.value });
