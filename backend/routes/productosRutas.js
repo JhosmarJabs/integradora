@@ -12,15 +12,4 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Ruta para agregar un nuevo producto
-router.post('/', async (req, res) => {
-    const producto = new Producto(req.body);
-    try {
-        const nuevoProducto = await producto.save();
-        res.status(201).json(nuevoProducto);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
-
 module.exports = router;

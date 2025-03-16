@@ -52,10 +52,10 @@ const productoSchema = new mongoose.Schema({
     specs: {
         material: String,
         conectividad: String,
-        batería: String,
-        motorización: String,
+        bateria: String, // Sin tilde para coincidir con la colección
+        motorizacion: String, // Sin tilde para coincidir con la colección
         resistencia: String,
     }
 });
 
-module.exports = mongoose.model("Producto", productoSchema);
+module.exports = mongoose.model("Productos", productoSchema);
