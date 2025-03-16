@@ -48,22 +48,42 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!loginEmail || !loginPassword) {
       setError('Por favor, completa todos los campos.');
       setSuccess('');
     } else {
-      // Lógica para enviar los datos al servidor
-      console.log('Iniciando sesión con:', loginEmail, loginPassword, rememberMe);
-      setError('');
-      setSuccess('¡Inicio de sesión exitoso!');
-      // Simulación de redirección después de un inicio de sesión exitoso
-      setTimeout(() => {
-        setSuccess('Redireccionando...');
-      }, 1500);
-    }
-  };
+      try {
+          const response = await fetch('http://localhost:5000/login', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  email: loginEmail,
+                  password: loginPassword
+              })
+          });
+          const data = await response.json();
+          if (response.ok) {
+              setError('');
+              setSuccess('¡Inicio de sesión exitoso!');
+              console.log('Usuario:', data.user);
+              // Simulación de redirección después de un inicio de sesión exitoso
+              setTimeout(() => {
+                  setSuccess('Redireccionando...');
+              }, 1500);
+          } else {
+              setError(data.message || 'Error al iniciar sesión. Inténtalo de nuevo.');
+              setSuccess('');
+          }
+      } catch (error) {
+          setError('Error al iniciar sesión. Inténtalo de nuevo.');
+          setSuccess('');
+      }
+  }
+};
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();

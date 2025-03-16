@@ -21,14 +21,39 @@ const Contacto = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const enviarContacto = async (contacto) => {
+    try {
+      const response = await fetch('http://localhost:5000/contacto', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(contacto)
+      });
+      return response.ok;
+    } catch (error) {
+      console.error('Error al enviar el contacto:', error);
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Simulación de envío de formulario
     if (formState.nombre && formState.email && formState.mensaje) {
+      const exito = await enviarContacto(formState);
+      if (exito) {
       setFormSubmitted(true);
       setFormError(false);
-      // Aquí iría la lógica real de envío
-      console.log('Formulario enviado:', formState);
+      setFormState({
+        nombre: '',
+        email: '',
+        telefono: '',
+        mensaje: ''
+      });
+    } else {
+      setFormError(true);
+    }
     } else {
       setFormError(true);
     }

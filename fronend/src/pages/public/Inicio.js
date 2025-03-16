@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Button, Row, Col, Card, Image } from "react-bootstrap";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import Cards from "../../components/CardsV"; // Componente de tarjetas
 import productos from "../../services/base"; // Base de datos simulada
 import { colors, typography } from "../../styles/styles"; // Importamos los estilos de la guía
