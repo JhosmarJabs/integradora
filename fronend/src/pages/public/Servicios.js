@@ -180,7 +180,7 @@ const Servicios = () => {
           descripcion: 'Controla la luz y la privacidad de tu hogar con persianas automatizadas, compatibles con sistemas de domótica.'
         }
       ],
-      imagen: 'https://via.placeholder.com/600x400'
+      imagen: "https://st2.depositphotos.com/2001755/8564/i/450/depositphotos_85647140-stock-photo-beautiful-landscape-with-birds.jpg"
     },
     {
       id: 'diseno',
