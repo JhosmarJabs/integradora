@@ -41,6 +41,9 @@ app.use("/productos", productosRoutes);
 const contactoRoutes = require("./routes/contactoRuta");
 app.use("/contacto", contactoRoutes);
 
+const serviciosRoutes = require("./routes/serviciosRuta");
+app.use("/servicios", serviciosRoutes);
+
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`🚀 La app está corriendo en http://localhost:${port}`);
