@@ -6,6 +6,7 @@ import Navbar from './layouts/Navbar';
 import Footer from './layouts/Footer';
 import Inicio from './pages/public/Inicio.js';
 import Productos from './pages/public/Productos';
+import ProductoDetalle from './pages/public/ProductoDetalle'; // Importamos el componente de detalle
 import Servicios from './pages/public/Servicios';
 import Nosotros from './pages/public/Nosotros';
 import Contacto from './pages/public/Contacto';
@@ -63,6 +64,7 @@ function App() {
           {/* Rutas Públicas */}
           <Route path="/" element={<PublicRoute><Inicio /></PublicRoute>} />
           <Route path="/productos" element={<PublicRoute><Productos /></PublicRoute>} />
+          <Route path="/producto/:id" element={<PublicRoute><ProductoDetalle /></PublicRoute>} /> {/* Nueva ruta para detalle de producto */}
           <Route path="/servicios" element={<PublicRoute><Servicios /></PublicRoute>} />
           <Route path="/nosotros" element={<PublicRoute><Nosotros /></PublicRoute>} />
           <Route path="/contacto" element={<PublicRoute><Contacto /></PublicRoute>} />

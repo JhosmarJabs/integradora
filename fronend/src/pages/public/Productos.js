@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Importamos useNavigate para la navegación
 import productos from "../../services/base"; // Importar la lista de productos
-import CardsP from "../../components/CardsP"; // Importar las tarjetas
 import { colors, textStyles, buttons } from "../../styles/styles"; // Importando estilos del sistema
 import "bootstrap/dist/css/bootstrap.min.css"; // Importar Bootstrap
 import "bootstrap-icons/font/bootstrap-icons.min.css"; // Importar Bootstrap Icons
 
 const Productos = () => {
+  const navigate = useNavigate(); // Hook para la navegación
   const [filtros, setFiltros] = useState({
     ordenar: "",
     tamaño: "",
@@ -24,6 +25,11 @@ const Productos = () => {
   const [filtrosActivos, setFiltrosActivos] = useState(0);
   // Estado para vista de cuadrícula o lista
   const [vistaGrilla, setVistaGrilla] = useState(true);
+
+  // Función para navegar al detalle del producto
+  const verDetalleProducto = (productoId) => {
+    navigate(`/producto/${productoId}`);
+  };
 
   const handleChange = (e) => {
     setFiltros({ ...filtros, [e.target.name]: e.target.value });
@@ -512,19 +518,13 @@ const Productos = () => {
         {/* Resultados */}
         {productosFiltrados.length > 0 ? (
           <div className="productResults">
-            {/* Si queremos usar el componente CardsP */}
-            {/* <CardsP productos={productosFiltrados} vistaGrilla={vistaGrilla} /> */}
-            
-            {/* O podemos implementar nuestra propia visualización */}
             <div style={styles.productGrid}>
               {productosFiltrados.map(producto => (
                 <div 
                   key={producto._id} 
                   style={styles.productCard}
-                  onClick={() => window.location.href = `/producto/${producto._id}`}
+                  onClick={() => verDetalleProducto(producto._id)}
                 >
-                  {/* Aquí iría la implementación de la tarjeta de producto */}
-                  {/* Este es solo un placeholder que deberías reemplazar con tus propias tarjetas */}
                   <div style={{
                     padding: vistaGrilla ? "0" : "15px",
                     display: "flex",
@@ -618,18 +618,24 @@ const Productos = () => {
                           </span>
                         </div>
                         
-                        <button style={{
-                          backgroundColor: colors.primaryMedium,
-                          color: colors.white,
-                          border: "none",
-                          borderRadius: "8px",
-                          padding: "8px 15px",
-                          fontSize: "14px",
-                          fontWeight: "600",
-                          cursor: "pointer",
-                          transition: "all 0.2s",
-                        }}>
-                          Ver Mas
+                        <button 
+                          style={{
+                            backgroundColor: colors.primaryMedium,
+                            color: colors.white,
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "8px 15px",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            transition: "all 0.2s",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Evitar que se propague el evento al contenedor
+                            verDetalleProducto(producto._id);
+                          }}
+                        >
+                          Ver Más
                         </button>
                       </div>
                     </div>
