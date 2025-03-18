@@ -10,6 +10,9 @@ import Servicios from './pages/public/Servicios';
 import Nosotros from './pages/public/Nosotros';
 import Contacto from './pages/public/Contacto';
 import Login from './pages/public/Login';
+import Dashboard from "./pages/private/Dashboard";
+import Perfil from "./pages/private/Perfil";
+import Configuracion from "./pages/private/Configuracion";
 
 // Componentes Administrativos
 import AdminLayout from './layouts/AdminLayout';
@@ -67,7 +70,10 @@ function App() {
           <Route path="/nosotros" element={<PublicRoute><Nosotros /></PublicRoute>} />
           <Route path="/contacto" element={<PublicRoute><Contacto /></PublicRoute>} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-          
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/configuracion" element={<Configuracion />} />
+
           {/* Rutas Administrativas */}
           <Route path="/admin" element={<AdminLayout />}>
             {/* Dashboard */}
