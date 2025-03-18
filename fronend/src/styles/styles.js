@@ -1,5 +1,3 @@
-// styles.js
-
 export const colors = {
     primaryDark: "#0D1B2A",  // Azul Oscuro
     primaryMedium: "#1B263B", // Azul Medio
@@ -68,4 +66,41 @@ export const textStyles = {
         color: colors.primaryLight,
         lineHeight: "1.5",
     },
+};
+
+// Estilos para el componente Configuracion (IoT)
+export const iotStyles = {
+    deviceCard: {
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        ':hover': {
+            transform: 'translateY(-5px)',
+            boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+        }
+    },
+    sensorCard: {
+        padding: '1rem',
+        backgroundColor: 'rgba(65, 90, 119, 0.15)', // Usando primaryLight con transparencia
+        borderRadius: '0.25rem',
+        textAlign: 'center'
+    },
+    iconCircle: {
+        padding: '1rem',
+        backgroundColor: colors.white,
+        borderRadius: '50%',
+        display: 'inline-block'
+    },
+    verticalSlider: {
+        height: '150px',
+        writingMode: 'bt-lr',
+        WebkitAppearance: 'slider-vertical'
+    },
+    addDeviceContainer: {
+        textAlign: 'center',
+        padding: '3rem 0'
+    },
+    addDeviceIcon: {
+        fontSize: '3rem',
+        color: colors.primaryDark
+    }
 };

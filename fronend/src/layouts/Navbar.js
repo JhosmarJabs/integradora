@@ -1,11 +1,17 @@
 import React, { useState } from "react";
-import { Navbar, Container, Nav, Button, Form, FormControl, NavDropdown } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Navbar, Container, Nav, Button, Form, FormControl, NavDropdown, Dropdown } from "react-bootstrap";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { colors } from "../styles/styles"; // Importamos estilos
 
 const NavbarComponent = () => {
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Verificar si estamos en cualquier área privada (dashboard, perfil, configuración)
+  const isPrivateArea = location.pathname.includes("/Dashboard") || 
+                         location.pathname.includes("/perfil") || 
+                         location.pathname.includes("/configuracion");
 
   // Categorías de productos para el menú desplegable
   const productCategories = [
@@ -21,6 +27,13 @@ const NavbarComponent = () => {
     setExpanded(false);
   };
 
+  // Función para manejar cierre de sesión
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+    setExpanded(false);
+  };
+
   return (
     <Navbar
       bg="light"
@@ -33,7 +46,7 @@ const NavbarComponent = () => {
         {/* Logo de la empresa */}
         <Navbar.Brand 
           as={Link} 
-          to="/" 
+          to={isPrivateArea ? "/Dashboard" : "/"} 
           className="fw-bold text-dark fs-4"
           onClick={() => setExpanded(false)}
           style={{ color: colors.primaryDark }}
@@ -49,119 +62,166 @@ const NavbarComponent = () => {
 
         {/* Contenido del navbar colapsable */}
         <Navbar.Collapse id="navbar-nav">
-          {/* Enlaces principales - centrados */}
-          <Nav className="mx-auto">
-            <Nav.Link 
-              as={Link} 
-              to="/" 
-              onClick={() => setExpanded(false)}
-              className="mx-2"
-              style={{ color: colors.primaryMedium }}
-            >
-              Inicio
-            </Nav.Link>
-            
-            {/* Menú desplegable de productos */}
-            <NavDropdown 
-              title="Productos" 
-              id="products-dropdown"
-              className="mx-2"
-              style={{ color: colors.primaryMedium }}
-            >
-              <NavDropdown.Item 
-                as={Link} 
-                to="/productos" 
-                onClick={() => setExpanded(false)}
-              >
-                Todos los productos
-              </NavDropdown.Item>
-              
-              <NavDropdown.Divider />
-              
-              {productCategories.map((category) => (
-                <NavDropdown.Item 
-                  key={category.slug} 
-                  onClick={() => handleCategorySelect(category.slug)}
+          {isPrivateArea ? (
+            // Menú para áreas privadas (Dashboard, Perfil, Configuración)
+            <>
+              <Nav className="mx-auto">
+                <Nav.Link 
+                  as={Link} 
+                  to="/Dashboard" 
+                  onClick={() => setExpanded(false)}
+                  className="mx-2"
+                  style={{ color: colors.primaryMedium }}
                 >
-                  {category.name}
-                </NavDropdown.Item>
-              ))}
-            </NavDropdown>
-            
-            <Nav.Link 
-              as={Link} 
-              to="/servicios" 
-              onClick={() => setExpanded(false)}
-              className="mx-2"
-              style={{ color: colors.primaryMedium }}
-            >
-              Servicios
-            </Nav.Link>
-            
-            <Nav.Link 
-              as={Link} 
-              to="/nosotros" 
-              onClick={() => setExpanded(false)}
-              className="mx-2"
-              style={{ color: colors.primaryMedium }}
-            >
-              Nosotros
-            </Nav.Link>
-            
-            <Nav.Link 
-              as={Link} 
-              to="/contacto" 
-              onClick={() => setExpanded(false)}
-              className="mx-2"
-              style={{ color: colors.primaryMedium }}
-            >
-              Contacto
-            </Nav.Link>
-          </Nav>
+                  Inicio
+                </Nav.Link>
+                {/* Si necesitas más enlaces en el área privada, puedes añadirlos aquí */}
+              </Nav>
+              
+              {/* Botón de cuenta en área privada - alineado a la derecha */}
+              <div className="d-flex align-items-center mt-3 mt-lg-0">
+                <Dropdown align="end">
+                  <Dropdown.Toggle 
+                    variant="outline-secondary" 
+                    id="dropdown-user"
+                    style={{ 
+                      backgroundColor: colors.primaryDark, 
+                      borderColor: colors.primaryDark,
+                      color: colors.white,
+                      borderRadius: "20px"
+                    }}
+                    className="px-3"
+                  >
+                    Mi Cuenta
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item as={Link} to="/perfil" onClick={() => setExpanded(false)}>Perfil</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/configuracion" onClick={() => setExpanded(false)}>Configuración</Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item as="button" onClick={handleLogout}>Cerrar Sesión</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
+            </>
+          ) : (
+            // Menú para áreas públicas - original del primer código
+            <>
+              {/* Enlaces principales - centrados */}
+              <Nav className="mx-auto">
+                <Nav.Link 
+                  as={Link} 
+                  to="/" 
+                  onClick={() => setExpanded(false)}
+                  className="mx-2"
+                  style={{ color: colors.primaryMedium }}
+                >
+                  Inicio
+                </Nav.Link>
+                
+                {/* Menú desplegable de productos */}
+                <NavDropdown 
+                  title="Productos" 
+                  id="products-dropdown"
+                  className="mx-2"
+                  style={{ color: colors.primaryMedium }}
+                >
+                  <NavDropdown.Item 
+                    as={Link} 
+                    to="/productos" 
+                    onClick={() => setExpanded(false)}
+                  >
+                    Todos los productos
+                  </NavDropdown.Item>
+                  
+                  <NavDropdown.Divider />
+                  
+                  {productCategories.map((category) => (
+                    <NavDropdown.Item 
+                      key={category.slug} 
+                      onClick={() => handleCategorySelect(category.slug)}
+                    >
+                      {category.name}
+                    </NavDropdown.Item>
+                  ))}
+                </NavDropdown>
+                
+                <Nav.Link 
+                  as={Link} 
+                  to="/servicios" 
+                  onClick={() => setExpanded(false)}
+                  className="mx-2"
+                  style={{ color: colors.primaryMedium }}
+                >
+                  Servicios
+                </Nav.Link>
+                
+                <Nav.Link 
+                  as={Link} 
+                  to="/nosotros" 
+                  onClick={() => setExpanded(false)}
+                  className="mx-2"
+                  style={{ color: colors.primaryMedium }}
+                >
+                  Nosotros
+                </Nav.Link>
+                
+                <Nav.Link 
+                  as={Link} 
+                  to="/contacto" 
+                  onClick={() => setExpanded(false)}
+                  className="mx-2"
+                  style={{ color: colors.primaryMedium }}
+                >
+                  Contacto
+                </Nav.Link>
+              </Nav>
 
-          {/* Barra de búsqueda y botón de inicio de sesión - alineados a la derecha */}
-          <div className="d-flex align-items-center mt-3 mt-lg-0">
-            {/* Barra de búsqueda */}
-            <Form className="d-flex me-2" onSubmit={(e) => e.preventDefault()}>
-              <FormControl 
-                type="search" 
-                placeholder="¿Qué estás buscando?" 
-                className="me-2 rounded-pill"
-                aria-label="Buscar"
-                style={{ borderColor: `${colors.primaryLight}50` }}
-              />
-              <Button 
-                style={{ 
-                  backgroundColor: colors.primaryDark, 
-                  borderColor: colors.primaryDark,
-                  borderRadius: "20px",
-                }}
-                type="submit"
-                className="rounded-pill px-3"
-              >
-                Buscar
-              </Button>
-            </Form>
+              {/* Barra de búsqueda y botón de inicio de sesión - alineados a la derecha */}
+              <div className="d-flex align-items-center mt-3 mt-lg-0">
+                {/* Barra de búsqueda */}
+                <Form className="d-flex me-2" onSubmit={(e) => e.preventDefault()}>
+                  <FormControl 
+                    type="search" 
+                    placeholder="¿Qué estás buscando?" 
+                    className="me-2 rounded-pill"
+                    aria-label="Buscar"
+                    style={{ borderColor: `${colors.primaryLight}50` }}
+                  />
+                  <Button 
+                    style={{ 
+                      backgroundColor: colors.primaryDark, 
+                      borderColor: colors.primaryDark,
+                      borderRadius: "20px",
+                    }}
+                    type="submit"
+                    className="rounded-pill px-3"
+                  >
+                    Buscar
+                  </Button>
+                </Form>
 
-            {/* Botón de inicio de sesión */}
-            <Button 
-              as={Link} 
-              to="/login" 
-              style={{ 
-                backgroundColor: colors.primaryDark, 
-                borderColor: colors.primaryDark,
-                whiteSpace: "nowrap",
-                borderRadius: "20px"
-              }} 
-              className="ms-2 px-3"
-            >
-              Iniciar Sesión
-            </Button>
-          </div>
+                {/* Botón de inicio de sesión */}
+                <Button 
+                  as={Link} 
+                  to="/login" 
+                  style={{ 
+                    backgroundColor: colors.primaryDark, 
+                    borderColor: colors.primaryDark,
+                    whiteSpace: "nowrap",
+                    borderRadius: "20px"
+                  }} 
+                  className="ms-2 px-3"
+                  onClick={() => setExpanded(false)}
+                >
+                  Iniciar Sesión
+                </Button>
+              </div>
+            </>
+          )}
         </Navbar.Collapse>
       </Container>
     </Navbar>
   );
 };
 
-export default NavbarComponent;
+export default NavbarComponent;;
