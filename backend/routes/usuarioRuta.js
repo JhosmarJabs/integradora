@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Usuario = require('../models/usuarios');
 
+//Usuario Ruta
 router.get('/', async (req, res) => {
     try {
         const usuario = await Usuario.find();
