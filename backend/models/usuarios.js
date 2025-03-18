@@ -4,6 +4,7 @@ const registerSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        unique: true, // Esto hace que el campo sea único
     },
     password: {
         type: String,

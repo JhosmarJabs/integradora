@@ -23,13 +23,6 @@ router.post('/', async (req, res) => {
         role: req.body.role,
         status: req.body.status
     });
-
-    try {
-        const savedUsuario = await usuario.save();
-        res.json(savedUsuario);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
 });
 
 module.exports = router;

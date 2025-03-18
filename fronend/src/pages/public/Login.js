@@ -85,54 +85,57 @@ const Login = () => {
   }
 };
 
-  const handleRegisterSubmit = async (e) => {
-    e.preventDefault();
-    if (!nombre || !apellido || !telefono || !email || !password || !confirmPassword) {
-      setError('Por favor, completa todos los campos.');
-      setSuccess('');
-    } else if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
-      setSuccess('');
-    } else if (!acceptTerms) {
-      setError('Debes aceptar los Términos de Servicio y la Política de Privacidad para continuar.');
-      setSuccess('');
-    } else {
-      try {
-        const response = await fetch('http://localhost:5000/usuario', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: nombre,
-            surname: apellido,
-            phone: telefono,
-            email: email,
-            password: password,
-            role: 'user', // Puedes ajustar esto según tus necesidades
-            status: 'active' // Puedes ajustar esto según tus necesidades
-          })
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setError('');
-          setSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
-          // Simulación de cambio a formulario de login después de un registro exitoso
-          setTimeout(() => {
-            setIsLogin(true);
-            setSuccess('');
-          }, 2000);
+const handleRegisterSubmit = async (e) => {
+  e.preventDefault();
+  if (!nombre || !apellido || !telefono || !email || !password || !confirmPassword) {
+    setError('Por favor, completa todos los campos.');
+    setSuccess('');
+  } else if (password !== confirmPassword) {
+    setError('Las contraseñas no coinciden.');
+    setSuccess('');
+  } else if (!acceptTerms) {
+    setError('Debes aceptar los Términos de Servicio y la Política de Privacidad para continuar.');
+    setSuccess('');
+  } else {
+    try {
+      const response = await fetch('http://localhost:5000/usuario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: nombre,
+          surname: apellido,
+          phone: telefono,
+          email: email,
+          password: password,
+          role: 'user', // Puedes ajustar esto según tus necesidades
+          status: 'active' // Puedes ajustar esto según tus necesidades
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setError('');
+        setSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
+        // Simulación de cambio a formulario de login después de un registro exitoso
+        setTimeout(() => {
+          setIsLogin(true);
+          setSuccess('');
+        }, 2000);
+      } else {
+        if (data.message === "El correo electrónico ya está registrado") {
+          setError(data.message); // Muestra el mensaje de error específico
         } else {
           setError(data.message || 'Error al registrar el usuario. Inténtalo de nuevo.');
-          setSuccess('');
         }
-      } catch (error) {
-        setError('Error al registrar el usuario. Inténtalo de nuevo.');
         setSuccess('');
       }
+    } catch (error) {
+      setError('Error al registrar el usuario. Inténtalo de nuevo.');
+      setSuccess('');
     }
-  };
-
+  }
+};
   // Verificación de fortaleza de contraseña
   const passwordStrength = (pass) => {
     if (!pass) return 0;
