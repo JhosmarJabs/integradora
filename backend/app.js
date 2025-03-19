@@ -44,6 +44,11 @@ app.use("/contacto", contactoRoutes);
 const serviciosRoutes = require("./routes/serviciosRuta");
 app.use("/servicios", serviciosRoutes);
 
+// Nueva ruta para dispositivos IoT
+const dispositivosIoTRoutes = require('./routes/dispositivosIoT');
+app.use('/dispositivos-iot', dispositivosIoTRoutes);
+
+
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`🚀 La app está corriendo en http://localhost:${port}`);
