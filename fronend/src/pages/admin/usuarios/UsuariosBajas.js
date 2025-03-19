@@ -4,104 +4,45 @@ import { FaUserMinus, FaSearch, FaExclamationTriangle, FaTrash, FaHistory, FaUse
 import { colors, textStyles } from '../../../styles/styles';
 
 const UsuariosBajas = () => {
-  // Estado para los usuarios
   const [usuarios, setUsuarios] = useState([]);
   const [filtro, setFiltro] = useState('');
   const [rolFiltro, setRolFiltro] = useState('');
-  
-  // Estado para confirmación de eliminación
   const [showModal, setShowModal] = useState(false);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [motivoBaja, setMotivoBaja] = useState('');
   const [confirmacion, setConfirmacion] = useState('');
-  const [accionTipo, setAccionTipo] = useState('desactivar'); // 'desactivar' o 'eliminar'
-  
-  // Estado para alertas
+  const [accionTipo, setAccionTipo] = useState('desactivar');
   const [alerta, setAlerta] = useState({ show: false, variant: '', mensaje: '' });
-  
-  // Cargar usuarios simulados al iniciar
+
   useEffect(() => {
-    // Datos de ejemplo (en un caso real, se obtendrían de la API)
-    const datosUsuarios = [
-      { 
-        id: 'USR-001', 
-        nombre: 'Juan Pérez', 
-        apellido: 'López',
-        email: 'juan.perez@ejemplo.com', 
-        telefono: '555-1234', 
-        rol: 'admin',
-        activo: true,
-        fechaRegistro: '2023-01-15',
-        ultimoAcceso: '2023-06-20',
-        departamento: 'Tecnología'
-      },
-      { 
-        id: 'USR-002', 
-        nombre: 'María', 
-        apellido: 'Rodríguez',
-        email: 'maria.rodriguez@ejemplo.com', 
-        telefono: '555-5678', 
-        rol: 'supervisor',
-        activo: true,
-        fechaRegistro: '2023-02-22',
-        ultimoAcceso: '2023-06-18',
-        departamento: 'Ventas'
-      },
-      { 
-        id: 'USR-003', 
-        nombre: 'Carlos', 
-        apellido: 'González',
-        email: 'carlos.gonzalez@ejemplo.com', 
-        telefono: '555-9012', 
-        rol: 'tecnico',
-        activo: true,
-        fechaRegistro: '2023-03-10',
-        ultimoAcceso: '2023-06-15',
-        departamento: 'Soporte'
-      },
-      { 
-        id: 'USR-004', 
-        nombre: 'Ana', 
-        apellido: 'Martínez',
-        email: 'ana.martinez@ejemplo.com', 
-        telefono: '555-3456', 
-        rol: 'cliente',
-        activo: false,
-        fechaRegistro: '2023-04-05',
-        ultimoAcceso: '2023-05-30',
-        departamento: 'Marketing'
-      },
-      { 
-        id: 'USR-005', 
-        nombre: 'Roberto', 
-        apellido: 'Sánchez',
-        email: 'roberto.sanchez@ejemplo.com', 
-        telefono: '555-7890', 
-        rol: 'admin',
-        activo: true,
-        fechaRegistro: '2023-05-18',
-        ultimoAcceso: '2023-06-22',
-        departamento: 'Administración'
+    const fetchUsuarios = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/usuario');
+        if (!response.ok) throw new Error('Error al cargar usuarios');
+        const data = await response.json();
+        setUsuarios(data);
+      } catch (error) {
+        setAlerta({
+          show: true,
+          variant: 'danger',
+          mensaje: error.message
+        });
       }
-    ];
-    
-    setUsuarios(datosUsuarios);
+    };
+    fetchUsuarios();
   }, []);
-  
-  // Filtrar usuarios
+
   const usuariosFiltrados = usuarios.filter(usuario => {
-    const nombreCompleto = `${usuario.nombre} ${usuario.apellido}`.toLowerCase();
-    const coincideTexto = nombreCompleto.includes(filtro.toLowerCase()) || 
+    const nombreCompleto = `${usuario.name} ${usuario.surname}`.toLowerCase();
+    const coincideTexto = nombreCompleto.includes(filtro.toLowerCase()) ||
                          usuario.email.toLowerCase().includes(filtro.toLowerCase()) ||
-                         usuario.id.toLowerCase().includes(filtro.toLowerCase());
-    const coincideRol = rolFiltro === '' || usuario.rol === rolFiltro;
+                         usuario._id.toLowerCase().includes(filtro.toLowerCase());
+    const coincideRol = rolFiltro === '' || usuario.role === rolFiltro;
     return coincideTexto && coincideRol;
   });
-  
-  // Obtener roles únicos para el filtro
-  const roles = [...new Set(usuarios.map(u => u.rol))];
-  
-  // Función para obtener nombre del rol
+
+  const roles = [...new Set(usuarios.map(u => u.role))];
+
   const getNombreRol = (rol) => {
     const roles = {
       'admin': 'Administrador',
@@ -111,8 +52,7 @@ const UsuariosBajas = () => {
     };
     return roles[rol] || rol;
   };
-  
-  // Manejadores
+
   const handleOpenModal = (usuario, tipo) => {
     setUsuarioSeleccionado(usuario);
     setMotivoBaja('');
@@ -120,16 +60,15 @@ const UsuariosBajas = () => {
     setAccionTipo(tipo);
     setShowModal(true);
   };
-  
+
   const handleCloseModal = () => {
     setShowModal(false);
     setUsuarioSeleccionado(null);
     setMotivoBaja('');
     setConfirmacion('');
   };
-  
-  const handleProcesar = () => {
-    // Validar que se ha ingresado un motivo
+
+  const handleProcesar = async () => {
     if (!motivoBaja.trim()) {
       setAlerta({
         show: true,
@@ -138,11 +77,9 @@ const UsuariosBajas = () => {
       });
       return;
     }
-    
-    // Validar confirmación para eliminación permanente
+
     if (accionTipo === 'eliminar') {
-      const confirmacionRequerida = usuarioSeleccionado.email;
-      if (confirmacion !== confirmacionRequerida) {
+      if (confirmacion !== usuarioSeleccionado.email) {
         setAlerta({
           show: true,
           variant: 'danger',
@@ -151,54 +88,62 @@ const UsuariosBajas = () => {
         return;
       }
     }
-    
-    if (accionTipo === 'desactivar') {
-      // Desactivar usuario (cambiar estado activo a false)
-      const usuariosActualizados = usuarios.map(u => {
-        if (u.id === usuarioSeleccionado.id) {
-          return { ...u, activo: false };
-        }
-        return u;
-      });
-      setUsuarios(usuariosActualizados);
-      
+
+    try {
+      if (accionTipo === 'desactivar') {
+        const response = await fetch(`http://localhost:5000/usuario/${usuarioSeleccionado._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            status: 'inactive',
+            motivoBaja: motivoBaja
+          })
+        });
+
+        if (!response.ok) throw new Error('Error al desactivar usuario');
+        const updatedUser = await response.json();
+        setUsuarios(usuarios.map(u => u._id === updatedUser._id ? updatedUser : u));
+        setAlerta({
+          show: true,
+          variant: 'success',
+          mensaje: `El usuario "${updatedUser.name} ${updatedUser.surname}" ha sido desactivado correctamente.`
+        });
+      } else {
+        const response = await fetch(`http://localhost:5000/usuario/${usuarioSeleccionado._id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ motivoBaja: motivoBaja })
+        });
+
+        if (!response.ok) throw new Error('Error al eliminar usuario');
+        setUsuarios(usuarios.filter(u => u._id !== usuarioSeleccionado._id));
+        setAlerta({
+          show: true,
+          variant: 'success',
+          mensaje: `El usuario "${usuarioSeleccionado.name} ${usuarioSeleccionado.surname}" ha sido eliminado permanentemente.`
+        });
+      }
+      handleCloseModal();
+    } catch (error) {
       setAlerta({
         show: true,
-        variant: 'success',
-        mensaje: `El usuario "${usuarioSeleccionado.nombre} ${usuarioSeleccionado.apellido}" ha sido desactivado correctamente.`
-      });
-    } else {
-      // Eliminar usuario permanentemente
-      const usuariosActualizados = usuarios.filter(u => u.id !== usuarioSeleccionado.id);
-      setUsuarios(usuariosActualizados);
-      
-      setAlerta({
-        show: true,
-        variant: 'success',
-        mensaje: `El usuario "${usuarioSeleccionado.nombre} ${usuarioSeleccionado.apellido}" ha sido eliminado permanentemente.`
+        variant: 'danger',
+        mensaje: error.message
       });
     }
-    
-    handleCloseModal();
   };
-  
+
   const pageStyles = {
     card: {
       borderRadius: '8px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
       marginBottom: '20px'
     },
-    title: {
-      ...textStyles.title,
-      marginBottom: '10px'
-    },
-    subtitle: {
-      ...textStyles.subtitle,
-      marginBottom: '20px'
-    },
-    badge: (activo) => {
-      return { backgroundColor: activo ? '#28a745' : '#dc3545' };
-    },
+    title: { ...textStyles.title, marginBottom: '10px' },
+    subtitle: { ...textStyles.subtitle, marginBottom: '20px' },
+    badge: (status) => ({ 
+      backgroundColor: status === 'active' ? '#28a745' : '#dc3545' 
+    }),
     rolBadge: (rol) => {
       const colores = {
         'admin': '#dc3545',
@@ -216,7 +161,7 @@ const UsuariosBajas = () => {
       borderRadius: '4px'
     }
   };
-  
+
   return (
     <Container fluid style={{ padding: '30px 20px' }}>
       <Row className="mb-4">
@@ -227,7 +172,7 @@ const UsuariosBajas = () => {
           </p>
         </Col>
       </Row>
-      
+
       {alerta.show && (
         <Alert 
           variant={alerta.variant} 
@@ -237,7 +182,7 @@ const UsuariosBajas = () => {
           {alerta.mensaje}
         </Alert>
       )}
-      
+
       <div style={pageStyles.warningSection}>
         <h5 style={{ color: '#856404', display: 'flex', alignItems: 'center' }}>
           <FaExclamationTriangle style={{ marginRight: '10px' }} /> Importante
@@ -246,15 +191,14 @@ const UsuariosBajas = () => {
           Existen dos opciones para dar de baja a los usuarios:
         </p>
         <ul style={{ color: '#856404', marginBottom: 0 }}>
-          <li><strong>Desactivar usuario:</strong> El usuario no podrá iniciar sesión, pero sus datos se conservan en el sistema.</li>
-          <li><strong>Eliminar permanentemente:</strong> Todos los datos del usuario serán borrados del sistema. Esta acción no se puede deshacer.</li>
+          <li><strong>Desactivar usuario:</strong> El usuario no podrá iniciar sesión, pero sus datos se conservan.</li>
+          <li><strong>Eliminar permanentemente:</strong> Todos los datos del usuario serán borrados. Acción irreversible.</li>
         </ul>
         <p style={{ color: '#856404', marginTop: '10px', marginBottom: 0 }}>
-          Se recomienda desactivar los usuarios en lugar de eliminarlos permanentemente, a menos que sea estrictamente necesario.
+          Se recomienda desactivar usuarios en lugar de eliminarlos, salvo que sea necesario.
         </p>
       </div>
-      
-      {/* Filtros */}
+
       <Row className="mb-4">
         <Col md={8}>
           <Form.Control
@@ -276,8 +220,7 @@ const UsuariosBajas = () => {
           </Form.Select>
         </Col>
       </Row>
-      
-      {/* Tabla de Usuarios */}
+
       <Card style={pageStyles.card}>
         <Card.Body>
           <Card.Title style={pageStyles.subtitle}>Listado de Usuarios</Card.Title>
@@ -293,33 +236,33 @@ const UsuariosBajas = () => {
                   <th>ID</th>
                   <th>Nombre</th>
                   <th>Email</th>
-                  <th>Departamento</th>
+                  <th>Teléfono</th>
                   <th>Rol</th>
                   <th>Estado</th>
-                  <th>Último Acceso</th>
+                  <th>Fecha Registro</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {usuariosFiltrados.map((usuario) => (
-                  <tr key={usuario.id}>
-                    <td>{usuario.id}</td>
-                    <td>{`${usuario.nombre} ${usuario.apellido}`}</td>
+                  <tr key={usuario._id}>
+                    <td>{usuario._id}</td>
+                    <td>{`${usuario.name} ${usuario.surname}`}</td>
                     <td>{usuario.email}</td>
-                    <td>{usuario.departamento}</td>
+                    <td>{usuario.phone}</td>
                     <td>
-                      <Badge style={pageStyles.rolBadge(usuario.rol)}>
-                        {getNombreRol(usuario.rol)}
+                      <Badge style={pageStyles.rolBadge(usuario.role)}>
+                        {getNombreRol(usuario.role)}
                       </Badge>
                     </td>
                     <td>
-                      <Badge style={pageStyles.badge(usuario.activo)}>
-                        {usuario.activo ? 'Activo' : 'Inactivo'}
+                      <Badge style={pageStyles.badge(usuario.status)}>
+                        {usuario.status === 'active' ? 'Activo' : 'Inactivo'}
                       </Badge>
                     </td>
-                    <td>{usuario.ultimoAcceso}</td>
+                    <td>{new Date(usuario.date).toLocaleDateString()}</td>
                     <td>
-                      {usuario.activo && (
+                      {usuario.status === 'active' && (
                         <Button 
                           variant="outline-warning" 
                           size="sm"
@@ -346,8 +289,7 @@ const UsuariosBajas = () => {
           )}
         </Card.Body>
       </Card>
-      
-      {/* Historial de Bajas */}
+
       <Card style={pageStyles.card}>
         <Card.Body>
           <Card.Title style={{ ...pageStyles.subtitle, display: 'flex', alignItems: 'center' }}>
@@ -364,10 +306,15 @@ const UsuariosBajas = () => {
           </p>
         </Card.Body>
       </Card>
-      
-      {/* Modal de Confirmación */}
+
       <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton style={{ backgroundColor: accionTipo === 'eliminar' ? '#f8d7da' : '#fff3cd', color: accionTipo === 'eliminar' ? '#721c24' : '#856404' }}>
+        <Modal.Header 
+          closeButton 
+          style={{ 
+            backgroundColor: accionTipo === 'eliminar' ? '#f8d7da' : '#fff3cd', 
+            color: accionTipo === 'eliminar' ? '#721c24' : '#856404' 
+          }}
+        >
           <Modal.Title>
             {accionTipo === 'eliminar' ? 'Eliminar Permanentemente' : 'Desactivar Usuario'}
           </Modal.Title>
@@ -383,10 +330,10 @@ const UsuariosBajas = () => {
                       : 'Está a punto de desactivar el siguiente usuario:'}
                   </strong>
                 </p>
-                <p>Usuario: <strong>{`${usuarioSeleccionado.nombre} ${usuarioSeleccionado.apellido}`}</strong></p>
+                <p>Usuario: <strong>{`${usuarioSeleccionado.name} ${usuarioSeleccionado.surname}`}</strong></p>
                 <p>Email: <strong>{usuarioSeleccionado.email}</strong></p>
-                <p>Rol: <strong>{getNombreRol(usuarioSeleccionado.rol)}</strong></p>
-                <p>ID: <strong>{usuarioSeleccionado.id}</strong></p>
+                <p>Rol: <strong>{getNombreRol(usuarioSeleccionado.role)}</strong></p>
+                <p>ID: <strong>{usuarioSeleccionado._id}</strong></p>
               </Alert>
               
               <Form.Group className="mb-3">
@@ -404,7 +351,7 @@ const UsuariosBajas = () => {
               {accionTipo === 'eliminar' && (
                 <Form.Group className="mb-3">
                   <Form.Label>
-                    Para confirmar la eliminación permanente, escriba el email del usuario: <strong>{usuarioSeleccionado.email}</strong>
+                    Para confirmar, escriba el email del usuario: <strong>{usuarioSeleccionado.email}</strong>
                   </Form.Label>
                   <Form.Control 
                     type="text" 
@@ -414,7 +361,7 @@ const UsuariosBajas = () => {
                     required
                   />
                   <Form.Text className="text-danger">
-                    Esta acción eliminará permanentemente al usuario y todos sus datos asociados. No se puede deshacer.
+                    Esta acción eliminará permanentemente al usuario y todos sus datos asociados.
                   </Form.Text>
                 </Form.Group>
               )}

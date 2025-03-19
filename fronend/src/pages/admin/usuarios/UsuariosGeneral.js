@@ -6,88 +6,44 @@ const UsuariosGeneral = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [filtro, setFiltro] = useState('');
   const [rolFiltro, setRolFiltro] = useState('');
-  
-  // Simular carga de datos
+
+  // Cargar datos desde la API
   useEffect(() => {
-    // Datos de ejemplo
-    const datosUsuarios = [
-      { 
-        id: '1', 
-        nombre: 'Juan', 
-        apellido: 'Pérez', 
-        email: 'juan.perez@ejemplo.com', 
-        telefono: '555-1234', 
-        rol: 'admin',
-        activo: true,
-        fechaRegistro: '2023-01-15'
-      },
-      { 
-        id: '2', 
-        nombre: 'María', 
-        apellido: 'López', 
-        email: 'maria.lopez@ejemplo.com', 
-        telefono: '555-5678', 
-        rol: 'cliente',
-        activo: true,
-        fechaRegistro: '2023-02-20'
-      },
-      { 
-        id: '3', 
-        nombre: 'Carlos', 
-        apellido: 'Rodríguez', 
-        email: 'carlos.rodriguez@ejemplo.com', 
-        telefono: '555-9012', 
-        rol: 'vendedor',
-        activo: true,
-        fechaRegistro: '2023-03-10'
-      },
-      { 
-        id: '4', 
-        nombre: 'Ana', 
-        apellido: 'García', 
-        email: 'ana.garcia@ejemplo.com', 
-        telefono: '555-3456', 
-        rol: 'cliente',
-        activo: false,
-        fechaRegistro: '2023-04-05'
-      },
-      { 
-        id: '5', 
-        nombre: 'Roberto', 
-        apellido: 'Fernández', 
-        email: 'roberto.fernandez@ejemplo.com', 
-        telefono: '555-7890', 
-        rol: 'admin',
-        activo: true,
-        fechaRegistro: '2023-05-18'
+    const fetchUsuarios = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/usuario');
+        if (!response.ok) throw new Error('Error al cargar usuarios');
+        const data = await response.json();
+        setUsuarios(data);
+      } catch (error) {
+        console.error('Error:', error);
       }
-    ];
-    
-    setUsuarios(datosUsuarios);
+    };
+
+    fetchUsuarios();
   }, []);
-  
+
   // Filtrar usuarios
   const usuariosFiltrados = usuarios.filter(usuario => {
-    const nombreCompleto = `${usuario.nombre} ${usuario.apellido}`.toLowerCase();
+    const nombreCompleto = `${usuario.name} ${usuario.surname}`.toLowerCase();
     const coincideTexto = nombreCompleto.includes(filtro.toLowerCase()) || 
                          usuario.email.toLowerCase().includes(filtro.toLowerCase());
-    const coincideRol = rolFiltro === '' || usuario.rol === rolFiltro;
+    const coincideRol = rolFiltro === '' || usuario.role === rolFiltro;
     return coincideTexto && coincideRol;
   });
-  
-  // Obtener roles únicos para el filtro
-  const roles = [...new Set(usuarios.map(u => u.rol))];
-  
-  // Estadísticas de usuarios
+
+  // Obtener roles únicos para el filtro (sin 'vendedor')
+  const roles = [...new Set(usuarios.map(u => u.role))].filter(rol => rol !== 'vendedor');
+
+  // Estadísticas de usuarios (sin 'vendedores')
   const estadisticas = {
     total: usuarios.length,
-    activos: usuarios.filter(u => u.activo).length,
-    inactivos: usuarios.filter(u => !u.activo).length,
-    administradores: usuarios.filter(u => u.rol === 'admin').length,
-    clientes: usuarios.filter(u => u.rol === 'cliente').length,
-    vendedores: usuarios.filter(u => u.rol === 'vendedor').length
+    activos: usuarios.filter(u => u.status === 'active').length,
+    inactivos: usuarios.filter(u => u.status === 'inactive').length,
+    administradores: usuarios.filter(u => u.role === 'admin').length,
+    clientes: usuarios.filter(u => u.role === 'cliente').length,
   };
-  
+
   // Estilos
   const pageStyles = {
     card: {
@@ -112,7 +68,17 @@ const UsuariosGeneral = () => {
       color: colors.primaryDark
     }
   };
-  
+
+  const getNombreRol = (rol) => {
+    const roles = {
+      'admin': 'Administrador',
+      'supervisor': 'Supervisor',
+      'tecnico': 'Técnico',
+      'cliente': 'Cliente'
+    };
+    return roles[rol] || rol;
+  };
+
   return (
     <Container fluid style={{ padding: '30px 20px' }}>
       <Row className="mb-4">
@@ -121,47 +87,41 @@ const UsuariosGeneral = () => {
           <p style={textStyles.paragraph}>Gestión y visualización de todos los usuarios del sistema.</p>
         </Col>
       </Row>
-      
+
       {/* Estadísticas */}
       <Row className="mb-4">
         <Col md={4} lg={2}>
-          <Card style={{...pageStyles.card, ...pageStyles.statCard}}>
+          <Card style={{ ...pageStyles.card, ...pageStyles.statCard }}>
             <div style={pageStyles.statTitle}>Total Usuarios</div>
             <div style={pageStyles.statValue}>{estadisticas.total}</div>
           </Card>
         </Col>
         <Col md={4} lg={2}>
-          <Card style={{...pageStyles.card, ...pageStyles.statCard, borderLeftColor: '#28a745'}}>
+          <Card style={{ ...pageStyles.card, ...pageStyles.statCard, borderLeftColor: '#28a745' }}>
             <div style={pageStyles.statTitle}>Usuarios Activos</div>
             <div style={pageStyles.statValue}>{estadisticas.activos}</div>
           </Card>
         </Col>
         <Col md={4} lg={2}>
-          <Card style={{...pageStyles.card, ...pageStyles.statCard, borderLeftColor: '#dc3545'}}>
+          <Card style={{ ...pageStyles.card, ...pageStyles.statCard, borderLeftColor: '#dc3545' }}>
             <div style={pageStyles.statTitle}>Usuarios Inactivos</div>
             <div style={pageStyles.statValue}>{estadisticas.inactivos}</div>
           </Card>
         </Col>
         <Col md={4} lg={2}>
-          <Card style={{...pageStyles.card, ...pageStyles.statCard, borderLeftColor: '#007bff'}}>
+          <Card style={{ ...pageStyles.card, ...pageStyles.statCard, borderLeftColor: '#007bff' }}>
             <div style={pageStyles.statTitle}>Administradores</div>
             <div style={pageStyles.statValue}>{estadisticas.administradores}</div>
           </Card>
         </Col>
         <Col md={4} lg={2}>
-          <Card style={{...pageStyles.card, ...pageStyles.statCard, borderLeftColor: '#6f42c1'}}>
+          <Card style={{ ...pageStyles.card, ...pageStyles.statCard, borderLeftColor: '#6f42c1' }}>
             <div style={pageStyles.statTitle}>Clientes</div>
             <div style={pageStyles.statValue}>{estadisticas.clientes}</div>
           </Card>
         </Col>
-        <Col md={4} lg={2}>
-          <Card style={{...pageStyles.card, ...pageStyles.statCard, borderLeftColor: '#fd7e14'}}>
-            <div style={pageStyles.statTitle}>Vendedores</div>
-            <div style={pageStyles.statValue}>{estadisticas.vendedores}</div>
-          </Card>
-        </Col>
       </Row>
-      
+
       {/* Filtros */}
       <Row className="mb-4">
         <Col md={9}>
@@ -179,12 +139,12 @@ const UsuariosGeneral = () => {
           >
             <option value="">Todos los roles</option>
             {roles.map((rol, idx) => (
-              <option key={idx} value={rol}>{rol.charAt(0).toUpperCase() + rol.slice(1)}</option>
+              <option key={idx} value={rol}>{getNombreRol(rol)}</option>
             ))}
           </Form.Select>
         </Col>
       </Row>
-      
+
       {/* Tabla de Usuarios */}
       <Card style={pageStyles.card}>
         <Card.Body>
@@ -204,25 +164,26 @@ const UsuariosGeneral = () => {
             </thead>
             <tbody>
               {usuariosFiltrados.map((usuario) => (
-                <tr key={usuario.id}>
-                  <td>{usuario.id}</td>
-                  <td>{`${usuario.nombre} ${usuario.apellido}`}</td>
+                <tr key={usuario._id}>
+                  <td>{usuario._id}</td>
+                  <td>{`${usuario.name} ${usuario.surname}`}</td>
                   <td>{usuario.email}</td>
-                  <td>{usuario.telefono}</td>
+                  <td>{usuario.phone}</td>
                   <td>
                     <Badge bg={
-                      usuario.rol === 'admin' ? 'danger' : 
-                      usuario.rol === 'vendedor' ? 'warning' : 'info'
+                      usuario.role === 'admin' ? 'danger' : 
+                      usuario.role === 'supervisor' ? 'warning' : 
+                      usuario.role === 'tecnico' ? 'info' : 'secondary'
                     }>
-                      {usuario.rol.charAt(0).toUpperCase() + usuario.rol.slice(1)}
+                      {getNombreRol(usuario.role)}
                     </Badge>
                   </td>
                   <td>
-                    <Badge bg={usuario.activo ? 'success' : 'secondary'}>
-                      {usuario.activo ? 'Activo' : 'Inactivo'}
+                    <Badge bg={usuario.status === 'active' ? 'success' : 'secondary'}>
+                      {usuario.status === 'active' ? 'Activo' : 'Inactivo'}
                     </Badge>
                   </td>
-                  <td>{usuario.fechaRegistro}</td>
+                  <td>{new Date(usuario.date).toLocaleDateString()}</td>
                   <td>
                     <Button 
                       variant="outline-primary" 
@@ -239,10 +200,10 @@ const UsuariosGeneral = () => {
                       Editar
                     </Button>
                     <Button 
-                      variant={usuario.activo ? 'outline-warning' : 'outline-success'} 
+                      variant={usuario.status === 'active' ? 'outline-warning' : 'outline-success'} 
                       size="sm"
                     >
-                      {usuario.activo ? 'Desactivar' : 'Activar'}
+                      {usuario.status === 'active' ? 'Desactivar' : 'Activar'}
                     </Button>
                   </td>
                 </tr>
