@@ -1,3 +1,5 @@
+// styles.js
+
 export const colors = {
     primaryDark: "#0D1B2A",  // Azul Oscuro
     primaryMedium: "#1B263B", // Azul Medio
@@ -102,5 +104,13 @@ export const iotStyles = {
     addDeviceIcon: {
         fontSize: '3rem',
         color: colors.primaryDark
-    }
+    },
+    deviceCard: {
+        cursor: "pointer",
+        textAlign: "center",
+        },
+        addDeviceContainer: {
+        textAlign: "center",
+        padding: "20px",
+    }, 
 };
