@@ -136,6 +136,7 @@ const handleRegisterSubmit = async (e) => {
     }
   }
 };
+
   // Verificación de fortaleza de contraseña
   const passwordStrength = (pass) => {
     if (!pass) return 0;
