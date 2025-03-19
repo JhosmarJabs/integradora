@@ -20,6 +20,25 @@ const Servicios = () => {
   const [animate, setAnimate] = useState(false);
   const [hoveredService, setHoveredService] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [servicios, setServicios] = useState([]); // Estado para almacenar los servicios desde la API
+
+  // Obtener los servicios desde la API
+  useEffect(() => {
+    const fetchServicios = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/servicios"); // Ajusta la URL según tu configuración
+        if (!response.ok) {
+          throw new Error("Error al obtener los servicios");
+        }
+        const data = await response.json();
+        setServicios(data);
+      } catch (error) {
+        console.error("Error al obtener los servicios:", error);
+      }
+    };
+
+    fetchServicios();
+  }, []);
 
   // Activar animaciones al cargar el componente
   useEffect(() => {
@@ -28,6 +47,7 @@ const Servicios = () => {
     }, 100);
     return () => clearTimeout(timer);
   }, []);
+
 
   // Estilos optimizados
   const styles = {
@@ -160,85 +180,6 @@ const Servicios = () => {
     }
   };
 
-  // Datos para servicios
-  const serviciosData = [
-    {
-      id: 'persianas',
-      titulo: 'Venta e Instalación de Persianas',
-      descripcion: 'Ofrecemos una amplia variedad de persianas para todos los gustos y necesidades:',
-      listItems: [
-        {
-          titulo: 'Persianas de Interior',
-          descripcion: 'Elegantes y funcionales, disponibles en una variedad de materiales como aluminio, madera y PVC.'
-        },
-        {
-          titulo: 'Persianas de Exterior',
-          descripcion: 'Resistentes a las condiciones climáticas, ideales para terrazas, balcones y ventanas.'
-        },
-        {
-          titulo: 'Persianas Inteligentes',
-          descripcion: 'Controla la luz y la privacidad de tu hogar con persianas automatizadas, compatibles con sistemas de domótica.'
-        }
-      ],
-      imagen: 'https://via.placeholder.com/600x400'
-    },
-    {
-      id: 'diseno',
-      titulo: 'Diseño Personalizado',
-      descripcion: 'En JADA Company, entendemos que cada espacio es único. Por eso, ofrecemos:',
-      listItems: [
-        {
-          titulo: 'Asesoramiento Personalizado',
-          descripcion: 'Nuestros expertos te guiarán en la elección de materiales, colores y estilos que mejor se adapten a tu espacio.'
-        },
-        {
-          titulo: 'Medición y Fabricación a Medida',
-          descripcion: 'Garantizamos un ajuste perfecto para cada ventana o puerta.'
-        }
-      ],
-      imagen: 'https://via.placeholder.com/600x400'
-    },
-    {
-      id: 'mantenimiento',
-      titulo: 'Mantenimiento y Reparación',
-      descripcion: 'Mantenemos tus persianas en perfecto estado con nuestros servicios de:',
-      listItems: [
-        {
-          titulo: 'Limpieza Profesional',
-          descripcion: 'Eliminamos polvo, suciedad y manchas para que tus persianas luzcan como nuevas.'
-        },
-        {
-          titulo: 'Reparaciones Rápidas',
-          descripcion: 'Solucionamos problemas como cortes, roturas o fallos en los mecanismos.'
-        }
-      ],
-      imagen: 'https://via.placeholder.com/600x400'
-    },
-    {
-      id: 'comercial',
-      titulo: 'Proyectos Comerciales',
-      descripcion: '¿Eres un negocio o empresa? Ofrecemos soluciones especializadas para:',
-      listItems: [
-        {
-          titulo: 'Oficinas y Edificios Corporativos',
-          descripcion: 'Persianas que combinan funcionalidad y diseño profesional.'
-        },
-        {
-          titulo: 'Hoteles y Restaurantes',
-          descripcion: 'Creación de ambientes únicos con persianas que se adaptan a la decoración y necesidades del sector.'
-        }
-      ],
-      imagen: 'https://via.placeholder.com/600x400'
-    },
-    {
-      id: 'instalacion',
-      titulo: 'Servicio de Instalación en Huejutla de Reyes, Hidalgo',
-      descripcion: 'Cubrimos toda el área de Huejutla de Reyes, Hidalgo, garantizando una instalación rápida, eficiente y profesional. Nuestro equipo de instaladores está altamente capacitado para ofrecer un servicio impecable.',
-      listItems: [],
-      imagen: 'https://via.placeholder.com/600x400'
-    }
-  ];
-
   // Datos para beneficios
   const benefitsData = [
     { 
@@ -325,7 +266,7 @@ const Servicios = () => {
 
   // Función para renderizar servicios con animación optimizada
   const renderServicios = useCallback(() => {
-    return serviciosData.map((servicio, index) => {
+    return servicios.map((servicio, index) => {
       // Alterna el orden de la imagen y el texto basado en el índice par/impar
       const isEven = index % 2 === 0;
 
@@ -336,7 +277,7 @@ const Servicios = () => {
             ...styles.section,
             paddingTop: index > 0 ? '20px' : '0',
           }}
-          key={servicio.id}
+          key={servicio._id}
         >
           {/* Imagen del servicio */}
           <Col md={6} className={`mb-4 mb-md-0 ${isEven ? 'order-md-1' : 'order-md-2'}`}>
@@ -345,7 +286,7 @@ const Servicios = () => {
                 ...styles.imageContainer,
                 ...styles[isEven ? 'slideLeft' : 'slideRight'](0.2 + (index * 0.05)),
               }}
-              onMouseEnter={() => setHoveredService(servicio.id)}
+              onMouseEnter={() => setHoveredService(servicio._id)}
               onMouseLeave={() => setHoveredService(null)}
             >
               <Image
@@ -354,10 +295,10 @@ const Servicios = () => {
                 fluid
                 style={{
                   ...styles.image,
-                  transform: hoveredService === servicio.id ? 'scale(1.05)' : 'scale(1)',
+                  transform: hoveredService === servicio._id ? 'scale(1.05)' : 'scale(1)',
                 }}
               />
-              {hoveredService === servicio.id && (
+              {hoveredService === servicio._id && (
                 <div 
                   style={{
                     position: 'absolute',
@@ -388,7 +329,7 @@ const Servicios = () => {
               
               <h2 style={{
                 ...styles.subtitle,
-                color: hoveredService === servicio.id ? colors.primaryMedium : styles.subtitle.color,
+                color: hoveredService === servicio._id ? colors.primaryMedium : styles.subtitle.color,
               }}>
                 {servicio.titulo}
                 <span style={{
@@ -399,7 +340,7 @@ const Servicios = () => {
                   height: '4px',
                   backgroundColor: colors.primaryLight,
                   transition: 'width 0.3s ease',
-                  width: hoveredService === servicio.id ? '100px' : '60px',
+                  width: hoveredService === servicio._id ? '100px' : '60px',
                 }}></span>
               </h2>
               <p style={styles.paragraph}>
@@ -411,7 +352,7 @@ const Servicios = () => {
                     <li key={idx} style={styles.listItem}>
                       <div style={{
                         transition: 'transform 0.3s ease',
-                        transform: hoveredService === servicio.id ? 'translateX(5px)' : 'translateX(0)',
+                        transform: hoveredService === servicio._id ? 'translateX(5px)' : 'translateX(0)',
                       }}>
                         <strong>{item.titulo}:</strong> {item.descripcion}
                       </div>

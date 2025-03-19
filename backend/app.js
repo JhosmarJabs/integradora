@@ -1,7 +1,11 @@
-// Usar require en lugar de import
+// Combinando ambas versiones del código
+require("dotenv").config(); // Cargar variables de entorno
+const mongoose = require("mongoose");
 const express = require('express');
 const cors = require('cors');
 const mqtt = require('mqtt');
+const bodyParser = require("body-parser");
+const path = require('path');
 
 const app = express();
 const puerto = process.env.PORT || 5000;
@@ -9,6 +13,9 @@ const puerto = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 app.use(cors());
+
+// Servidor de archivos estáticos
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Configuración de MQTT
 const MQTT_BROKER = "mqtt://127.0.0.1:1883";
@@ -30,7 +37,34 @@ mqttClient.on("message", (topic, message) => {
   }
 });
 
-// Rutas
+// Conectar a MongoDB Atlas
+console.log("🔍 URI de conexión:", process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log("✅ Conectado a MongoDB Atlas"))
+    .catch(error => console.error("❌ Error conectando a MongoDB:", error));
+
+// Ruta básica para la raíz
+app.get('/', (req, res) => {
+    res.send('Bienvenido a la API');
+});
+
+// Rutas de API
+const registerRoutes = require("./routes/usuarioRuta");
+app.use("/usuario", registerRoutes);
+
+const loginRoutes = require("./routes/loginRuta");
+app.use("/login", loginRoutes);
+
+const productosRoutes = require("./routes/productosRutas");
+app.use("/productos", productosRoutes);
+
+const contactoRoutes = require("./routes/contactoRuta");
+app.use("/contacto", contactoRoutes);
+
+const serviciosRoutes = require("./routes/serviciosRuta");
+app.use("/servicios", serviciosRoutes);
+
+// Rutas para el control del LED
 app.get("/estado", (req, res) => {
   res.json({ state: estadoLed });
 });
@@ -51,5 +85,5 @@ app.post("/control", (req, res) => {
 
 // Iniciar servidor
 app.listen(puerto, () => {
-  console.log(`Servidor ejecutándose en http://localhost:${puerto}`);
+  console.log(`🚀 Servidor ejecutándose en http://localhost:${puerto}`);
 });

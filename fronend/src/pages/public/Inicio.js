@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Container, Button, Row, Col, Card, Image } from "react-bootstrap";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import Cards from "../../components/CardsV"; // Componente de tarjetas
-import productos from "../../services/base"; // Base de datos simulada
 import { colors, typography } from "../../styles/styles"; // Importamos los estilos de la guía
 
 const Inicio = () => {
   const navigate = useNavigate();
   const [destacados, setDestacados] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [productos, setProductos] = useState([]);//Estado para almacenar los productos de la api
   const [productoEstrella, setProductoEstrella] = useState(null);
   const [isVisible, setIsVisible] = useState({
     hero: false,
@@ -20,26 +20,44 @@ const Inicio = () => {
     cta: false
   });
 
+  // Obtener los productos desde la API
   useEffect(() => {
-    // Filtrar productos destacados (con rating alto o descuento)
-    const productosDestacados = productos
-      .filter(p => p.rating >= 4.7 || p.discount >= 10)
-      .slice(0, 4);
-    setDestacados(productosDestacados);
+    const fetchProductos = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/productos"); // Ajusta la URL según tu configuración
+        if (!response.ok) {
+          throw new Error("Error al obtener los productos");
+        }
+        const data = await response.json();
+        setProductos(data);
 
-    // Extraer categorías únicas de productos
-    const categoriasUnicas = [...new Set(productos.map(p => p.category))];
-    const categoriasData = categoriasUnicas.map(categoria => {
-      const productosCategoria = productos.filter(p => p.category === categoria);
-      return {
-        nombre: categoria,
-        cantidad: productosCategoria.length,
-        imagen: productosCategoria[0]?.image // Usamos la imagen del primer producto
-      };
-    });
-    setCategorias(categoriasData);
+        // Filtrar productos destacados (con rating alto o descuento)
+        const productosDestacados = data
+          .filter(p => p.rating >= 4.7 || p.discount >= 10)
+          .slice(0, 4);
+        setDestacados(productosDestacados);
 
-    // Crear producto estrella (persianas inteligentes)
+        // Extraer categorías únicas de productos
+        const categoriasUnicas = [...new Set(data.map(p => p.category))];
+        const categoriasData = categoriasUnicas.map(categoria => {
+          const productosCategoria = data.filter(p => p.category === categoria);
+          return {
+            nombre: categoria,
+            cantidad: productosCategoria.length,
+            imagen: productosCategoria[0]?.image // Usamos la imagen del primer producto
+          };
+        });
+        setCategorias(categoriasData);
+      } catch (error) {
+        console.error("Error al obtener los productos:", error);
+      }
+    };
+
+    fetchProductos();
+  }, []);
+
+  // Crear producto estrella (persianas inteligentes)
+  useEffect(() => {
     const persianaInteligente = {
       _id: "650a1f1b3e0d3a001c1a4b21",
       image: "https://st2.depositphotos.com/2001755/8564/i/450/depositphotos_85647140-stock-photo-beautiful-landscape-with-birds.jpg",

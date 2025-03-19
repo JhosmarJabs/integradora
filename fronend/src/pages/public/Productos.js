@@ -8,7 +8,7 @@ import "bootstrap-icons/font/bootstrap-icons.min.css"; // Importar Bootstrap Ico
 const Productos = () => {
   const navigate = useNavigate(); // Hook para la navegación
   const [filtros, setFiltros] = useState({
-    ordenar: "",
+    ordenar: "",  
     tamaño: "",
     filtracionLuz: "",
     color: "",
