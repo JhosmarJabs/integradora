@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Table, Form, Button, Badge, InputGroup } from 'react-bootstrap';
-import { colors, typography, buttons } from '../../../styles/styles';
+import { colors, typography, buttons } from '../styles/styles';
 
 const DispositivosList = ({ devices, onSelectDevice }) => {
   const [searchTerm, setSearchTerm] = useState('');
