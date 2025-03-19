@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Card, Form, Button, Alert } from "react-bootstrap";
-import { colours, typography, textStyles, buttons } from "../../styles/styles";
+import { colors, typography, textStyles, buttons } from "../../styles/styles";
 
 const Perfil = () => {
   // Estados para almacenar datos del usuario
