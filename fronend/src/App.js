@@ -50,7 +50,8 @@ import PreguntasGeneral from './pages/admin/preguntas/PreguntasGeneral.js';
 import PreguntasAltas from './pages/admin/preguntas/PreguntasAltas.js';
 import PreguntasBajas from './pages/admin/preguntas/PreguntasBajas.js';
 import PreguntasCambios from './pages/admin/preguntas/PreguntasCambios.js';
-
+// Componente de 
+import IoTTests from './pages/admin/iot/IoTTest.js';
 // Componente para envolver las rutas públicas
 const PublicRoute = ({ children }) => {
   return (
@@ -77,11 +78,11 @@ function App() {
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
            {/* Rutas privadas agrupadas */}
-           <Route path="/" element={<PrivateLayout />}>
-            <Route index element={<DashboardP />} />
-            <Route path="perfil" element={<Perfil />} />
-            <Route path="configuracion" element={<Configuracion />} />
-          </Route>
+            <Route path="/privado" element={<PrivateLayout />}>
+              <Route index element={<Privado />} />
+              <Route path="perfil" element={<Perfil />} />
+              <Route path="configuracion" element={<Configuracion />} />
+            </Route>
 
           {/* Rutas Administrativas */}
           <Route path="/admin" element={<AdminLayout />}>
@@ -116,6 +117,8 @@ function App() {
             <Route path="preguntas/altas" element={<PreguntasAltas />} />
             <Route path="preguntas/bajas" element={<PreguntasBajas />} />
             <Route path="preguntas/cambios" element={<PreguntasCambios />} />
+            {/* Prueva para IOT*/}
+            <Route path="iot/test" element={<IoTTests />} />
           </Route>
         </Routes>
       </div>

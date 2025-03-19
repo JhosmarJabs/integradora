@@ -51,20 +51,20 @@ const Perfil = () => {
   };
 
   const headerStyle = {
-    backgroundColor: colours.primarioLight,
-    borderBottom: `2px solid ${colours.primarioMedium}`
+    backgroundColor: colors.primarioLight,
+    borderBottom: `2px solid ${colors.primarioMedium}`
   };
 
   const iconCircleStyle = {
     width: "50px", 
     height: "50px", 
     borderRadius: "50%", 
-    backgroundColor: colours.primarioDark,
+    backgroundColor: colors.primarioDark,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     marginRight: "10px",
-    color: colours.white
+    color: colors.white
   };
 
   const titleStyle = {
