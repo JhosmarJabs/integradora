@@ -12,11 +12,11 @@ import Nosotros from './pages/public/Nosotros';
 import Contacto from './pages/public/Contacto';
 import Login from './pages/public/Login';
 
-//Componentes Privados
+// Páginas privadas
+import DashboardPrivado from './pages/private/DashboardPrivado';
+import Dispositivos from './pages/private/Dispositivos';
+import Perfil from './pages/private/Perfil';
 import PrivateLayout from './layouts/PrivateLayout';
-import Privado from './pages/private/Privado';
-import Perfil from "./pages/private/Perfil";
-import Configuracion from "./pages/private/Configuracion";
 
 // Componentes Administrativos
 import AdminLayout from './layouts/AdminLayout';
@@ -78,10 +78,12 @@ function App() {
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
            {/* Rutas privadas agrupadas */}
+
             <Route path="/privado" element={<PrivateLayout />}>
-              <Route index element={<Privado />} />
+              <Route index element={<DashboardPrivado />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="dispositivos" element={<Dispositivos />} />
               <Route path="perfil" element={<Perfil />} />
-              <Route path="configuracion" element={<Configuracion />} />
             </Route>
 
           {/* Rutas Administrativas */}
