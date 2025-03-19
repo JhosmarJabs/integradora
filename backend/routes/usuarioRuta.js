@@ -2,27 +2,37 @@ const express = require('express');
 const router = express.Router();
 const Usuario = require('../models/usuarios');
 
-//Usuario Ruta
-router.get('/', async (req, res) => {
-    try {
-        const usuario = await Usuario.find();
-        res.json(usuario);
-    } catch (error) {
-        res.json({ message: error });
-    }
-});
-
-// Nueva ruta POST para crear un registro
+// Ruta POST para crear un nuevo usuario
 router.post('/', async (req, res) => {
-    const usuario = new Usuario({
-        email: req.body.email,
-        password: req.body.password,
-        name: req.body.name,
-        surname: req.body.surname,
-        phone: req.body.phone,
-        role: req.body.role,
-        status: req.body.status
-    });
+    const { email, password, name, surname, phone, role, status } = req.body;
+
+    // Validación básica de campos requeridos
+    if (!email || !password || !name || !surname || !phone || !role || !status) {
+        return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    }
+
+    try {
+        // Crear y guardar el nuevo usuario
+        const nuevoUsuario = new Usuario({
+            email,
+            password,
+            name,
+            surname,
+            phone,
+            role,
+            status
+        });
+
+        const savedUsuario = await nuevoUsuario.save();
+        res.status(201).json(savedUsuario);
+    } catch (error) {
+        // Manejo de errores específicos
+        if (error.code === 11000) { // Código de error de duplicado en MongoDB
+            res.status(400).json({ message: "El correo electrónico ya está registrado" });
+        } else {
+            res.status(500).json({ message: "Error al registrar el usuario", error: error.message });
+        }
+    }
 });
 
 module.exports = router;
