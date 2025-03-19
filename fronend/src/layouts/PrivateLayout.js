@@ -1,4 +1,7 @@
 import { Outlet, Navigate } from "react-router-dom";
+import '../App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { colors, typography } from '../styles/styles';
 
 const PrivateLayout = () => {
   // Aquí deberías verificar si el usuario está autenticado

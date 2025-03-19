@@ -51,9 +51,10 @@ const Perfil = () => {
   };
 
   const headerStyle = {
-    backgroundColor: colours.primarioLight,
-    borderBottom: `2px solid ${colours.primarioMedium}`
-  };
+    backgroundColor: colors.primaryLight,  
+    borderBottom: `2px solid ${colors.primaryMedium}`
+};
+
 
   const iconCircleStyle = {
     width: "50px", 
