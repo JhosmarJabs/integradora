@@ -19,64 +19,37 @@ const IoTAltas = () => {
   const [alerta, setAlerta] = useState({ show: false, variant: '', mensaje: '' });
   const [showConfiguracionAvanzada, setShowConfiguracionAvanzada] = useState(false);
   
-  // Obtener un ID aleatorio para el dispositivo
   const generarID = () => {
     const randomID = 'DISP-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    setFormData({...formData, id: randomID});
+    setFormData({ ...formData, id: randomID });
   };
   
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData({ ...formData, [name]: value });
   };
   
   const handleTipoChange = (e) => {
     const tipo = e.target.value;
     let configuracion = {};
     
-    // Establecer opciones de configuración según el tipo
     if (tipo === 'sensor') {
-      configuracion = {
-        intervaloMuestreo: 60,
-        unidadMedida: '',
-        rangoMin: 0,
-        rangoMax: 100
-      };
+      configuracion = { intervaloMuestreo: 60, unidadMedida: '', rangoMin: 0, rangoMax: 100 };
     } else if (tipo === 'actuador') {
-      configuracion = {
-        tipoControl: 'binario',
-        estadoInicial: 'apagado'
-      };
+      configuracion = { tipoControl: 'binario', estadoInicial: 'apagado' };
     } else if (tipo === 'camara') {
-      configuracion = {
-        resolucion: '720p',
-        fps: 30,
-        almacenamiento: 'nube'
-      };
+      configuracion = { resolucion: '720p', fps: 30, almacenamiento: 'nube' };
     }
     
-    setFormData({
-      ...formData,
-      tipo,
-      configuracion
-    });
+    setFormData({ ...formData, tipo, configuracion });
   };
   
   const handleConfiguracionChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      configuracion: {
-        ...formData.configuracion,
-        [name]: value
-      }
-    });
+    setFormData({ ...formData, configuracion: { ...formData.configuracion, [name]: value } });
   };
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
     
@@ -86,60 +59,50 @@ const IoTAltas = () => {
       return;
     }
     
-    // Aquí iría la lógica para guardar en la base de datos
-    // Simulación de guardado exitoso
-    setAlerta({
-      show: true,
-      variant: 'success',
-      mensaje: `El dispositivo "${formData.nombre}" ha sido registrado correctamente con ID: ${formData.id}`
-    });
-    
-    // Resetear formulario
-    setFormData({
-      id: '',
-      nombre: '',
-      tipo: 'sensor',
-      ubicacion: '',
-      conexion: 'wifi',
-      propietario: '',
-      descripcion: '',
-      configuracion: {}
-    });
-    setValidated(false);
-    setShowConfiguracionAvanzada(false);
+    try {
+      const response = await fetch('http://localhost:5000/dispositivos-iot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al registrar el dispositivo');
+      }
+
+      const savedDispositivo = await response.json();
+      setAlerta({
+        show: true,
+        variant: 'success',
+        mensaje: `El dispositivo "${savedDispositivo.nombre}" ha sido registrado correctamente con ID: ${savedDispositivo.idDispositivo}`
+      });
+
+      // Resetear formulario
+      setFormData({
+        id: '',
+        nombre: '',
+        tipo: 'sensor',
+        ubicacion: '',
+        conexion: 'wifi',
+        propietario: '',
+        descripcion: '',
+        configuracion: {}
+      });
+      setValidated(false);
+      setShowConfiguracionAvanzada(false);
+    } catch (error) {
+      setAlerta({ show: true, variant: 'danger', mensaje: error.message });
+    }
   };
   
   const pageStyles = {
-    card: {
-      borderRadius: '8px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-      marginBottom: '20px'
-    },
-    title: {
-      ...textStyles.title,
-      marginBottom: '10px'
-    },
-    subtitle: {
-      ...textStyles.subtitle,
-      marginBottom: '20px'
-    },
-    formGroup: {
-      marginBottom: '20px'
-    },
-    actionButtons: {
-      display: 'flex',
-      justifyContent: 'flex-end',
-      gap: '10px',
-      marginTop: '20px'
-    },
-    configHeader: {
-      borderBottom: '1px solid #dee2e6',
-      paddingBottom: '10px',
-      marginBottom: '20px',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center'
-    }
+    card: { borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', marginBottom: '20px' },
+    title: { ...textStyles.title, marginBottom: '10px' },
+    subtitle: { ...textStyles.subtitle, marginBottom: '20px' },
+    formGroup: { marginBottom: '20px' },
+    actionButtons: { display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' },
+    configHeader: { borderBottom: '1px solid #dee2e6', paddingBottom: '10px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }
   };
   
   return (
@@ -147,18 +110,12 @@ const IoTAltas = () => {
       <Row className="mb-4">
         <Col>
           <h2 style={pageStyles.title}>Registro de Dispositivos IoT</h2>
-          <p style={textStyles.paragraph}>
-            Utilice este formulario para dar de alta nuevos dispositivos IoT en el sistema.
-          </p>
+          <p style={textStyles.paragraph}>Utilice este formulario para dar de alta nuevos dispositivos IoT en el sistema.</p>
         </Col>
       </Row>
       
       {alerta.show && (
-        <Alert 
-          variant={alerta.variant} 
-          onClose={() => setAlerta({...alerta, show: false})} 
-          dismissible
-        >
+        <Alert variant={alerta.variant} onClose={() => setAlerta({ ...alerta, show: false })} dismissible>
           {alerta.mensaje}
         </Alert>
       )}
@@ -181,17 +138,11 @@ const IoTAltas = () => {
                       placeholder="DISP-0000"
                       required
                     />
-                    <Button 
-                      variant="outline-secondary"
-                      onClick={generarID}
-                      title="Generar ID aleatorio"
-                    >
+                    <Button variant="outline-secondary" onClick={generarID} title="Generar ID aleatorio">
                       <FaQrcode />
                     </Button>
                   </InputGroup>
-                  <Form.Control.Feedback type="invalid">
-                    El ID del dispositivo es obligatorio.
-                  </Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">El ID del dispositivo es obligatorio.</Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={6}>
@@ -205,9 +156,7 @@ const IoTAltas = () => {
                     placeholder="Ej: Sensor de Temperatura Sala"
                     required
                   />
-                  <Form.Control.Feedback type="invalid">
-                    El nombre del dispositivo es obligatorio.
-                  </Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">El nombre del dispositivo es obligatorio.</Form.Control.Feedback>
                 </Form.Group>
               </Col>
             </Row>
@@ -216,12 +165,7 @@ const IoTAltas = () => {
               <Col md={4}>
                 <Form.Group style={pageStyles.formGroup}>
                   <Form.Label>Tipo de Dispositivo</Form.Label>
-                  <Form.Select 
-                    name="tipo" 
-                    value={formData.tipo} 
-                    onChange={handleTipoChange}
-                    required
-                  >
+                  <Form.Select name="tipo" value={formData.tipo} onChange={handleTipoChange} required>
                     <option value="sensor">Sensor</option>
                     <option value="actuador">Actuador</option>
                     <option value="camara">Cámara</option>
@@ -233,12 +177,7 @@ const IoTAltas = () => {
               <Col md={4}>
                 <Form.Group style={pageStyles.formGroup}>
                   <Form.Label>Tipo de Conexión</Form.Label>
-                  <Form.Select 
-                    name="conexion" 
-                    value={formData.conexion} 
-                    onChange={handleChange}
-                    required
-                  >
+                  <Form.Select name="conexion" value={formData.conexion} onChange={handleChange} required>
                     <option value="wifi">WiFi</option>
                     <option value="bluetooth">Bluetooth</option>
                     <option value="zigbee">Zigbee</option>
@@ -258,9 +197,7 @@ const IoTAltas = () => {
                     placeholder="Ej: Sala de Servidores"
                     required
                   />
-                  <Form.Control.Feedback type="invalid">
-                    La ubicación del dispositivo es obligatoria.
-                  </Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">La ubicación del dispositivo es obligatoria.</Form.Control.Feedback>
                 </Form.Group>
               </Col>
             </Row>
@@ -275,9 +212,7 @@ const IoTAltas = () => {
                 placeholder="Nombre del responsable del dispositivo"
                 required
               />
-              <Form.Control.Feedback type="invalid">
-                El propietario o responsable es obligatorio.
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">El propietario o responsable es obligatorio.</Form.Control.Feedback>
             </Form.Group>
             
             <Form.Group style={pageStyles.formGroup}>
@@ -293,11 +228,7 @@ const IoTAltas = () => {
             </Form.Group>
             
             <div style={pageStyles.configHeader}>
-              <Button 
-                variant="link" 
-                onClick={() => setShowConfiguracionAvanzada(!showConfiguracionAvanzada)}
-                className="p-0"
-              >
+              <Button variant="link" onClick={() => setShowConfiguracionAvanzada(!showConfiguracionAvanzada)} className="p-0">
                 {showConfiguracionAvanzada ? "Ocultar configuración avanzada" : "Mostrar configuración avanzada"}
               </Button>
             </div>
@@ -306,67 +237,40 @@ const IoTAltas = () => {
               <Card style={{ marginBottom: '20px' }}>
                 <Card.Body>
                   <Card.Title style={{ fontSize: '16px', marginBottom: '15px' }}>Configuración Específica</Card.Title>
-                  
                   {formData.tipo === 'sensor' && (
                     <Row>
                       <Col md={6}>
                         <Form.Group style={pageStyles.formGroup}>
                           <Form.Label>Intervalo de Muestreo (segundos)</Form.Label>
-                          <Form.Control 
-                            type="number" 
-                            name="intervaloMuestreo" 
-                            value={formData.configuracion.intervaloMuestreo || ''} 
-                            onChange={handleConfiguracionChange}
-                          />
+                          <Form.Control type="number" name="intervaloMuestreo" value={formData.configuracion.intervaloMuestreo || ''} onChange={handleConfiguracionChange} />
                         </Form.Group>
                       </Col>
                       <Col md={6}>
                         <Form.Group style={pageStyles.formGroup}>
                           <Form.Label>Unidad de Medida</Form.Label>
-                          <Form.Control 
-                            type="text" 
-                            name="unidadMedida" 
-                            value={formData.configuracion.unidadMedida || ''} 
-                            onChange={handleConfiguracionChange}
-                            placeholder="Ej: °C, %, lux"
-                          />
+                          <Form.Control type="text" name="unidadMedida" value={formData.configuracion.unidadMedida || ''} onChange={handleConfiguracionChange} placeholder="Ej: °C, %, lux" />
                         </Form.Group>
                       </Col>
                       <Col md={6}>
                         <Form.Group style={pageStyles.formGroup}>
                           <Form.Label>Rango Mínimo</Form.Label>
-                          <Form.Control 
-                            type="number" 
-                            name="rangoMin" 
-                            value={formData.configuracion.rangoMin || ''} 
-                            onChange={handleConfiguracionChange}
-                          />
+                          <Form.Control type="number" name="rangoMin" value={formData.configuracion.rangoMin || ''} onChange={handleConfiguracionChange} />
                         </Form.Group>
                       </Col>
                       <Col md={6}>
                         <Form.Group style={pageStyles.formGroup}>
                           <Form.Label>Rango Máximo</Form.Label>
-                          <Form.Control 
-                            type="number" 
-                            name="rangoMax" 
-                            value={formData.configuracion.rangoMax || ''} 
-                            onChange={handleConfiguracionChange}
-                          />
+                          <Form.Control type="number" name="rangoMax" value={formData.configuracion.rangoMax || ''} onChange={handleConfiguracionChange} />
                         </Form.Group>
                       </Col>
                     </Row>
                   )}
-                  
                   {formData.tipo === 'actuador' && (
                     <Row>
                       <Col md={6}>
                         <Form.Group style={pageStyles.formGroup}>
                           <Form.Label>Tipo de Control</Form.Label>
-                          <Form.Select 
-                            name="tipoControl" 
-                            value={formData.configuracion.tipoControl || ''} 
-                            onChange={handleConfiguracionChange}
-                          >
+                          <Form.Select name="tipoControl" value={formData.configuracion.tipoControl || ''} onChange={handleConfiguracionChange}>
                             <option value="binario">Binario (On/Off)</option>
                             <option value="variable">Variable (Dimmer)</option>
                             <option value="multiestado">Multi-estado</option>
@@ -376,11 +280,7 @@ const IoTAltas = () => {
                       <Col md={6}>
                         <Form.Group style={pageStyles.formGroup}>
                           <Form.Label>Estado Inicial</Form.Label>
-                          <Form.Select 
-                            name="estadoInicial" 
-                            value={formData.configuracion.estadoInicial || ''} 
-                            onChange={handleConfiguracionChange}
-                          >
+                          <Form.Select name="estadoInicial" value={formData.configuracion.estadoInicial || ''} onChange={handleConfiguracionChange}>
                             <option value="apagado">Apagado</option>
                             <option value="encendido">Encendido</option>
                             <option value="ultimo">Último estado</option>
@@ -389,17 +289,12 @@ const IoTAltas = () => {
                       </Col>
                     </Row>
                   )}
-                  
                   {formData.tipo === 'camara' && (
                     <Row>
                       <Col md={4}>
                         <Form.Group style={pageStyles.formGroup}>
                           <Form.Label>Resolución</Form.Label>
-                          <Form.Select 
-                            name="resolucion" 
-                            value={formData.configuracion.resolucion || ''} 
-                            onChange={handleConfiguracionChange}
-                          >
+                          <Form.Select name="resolucion" value={formData.configuracion.resolucion || ''} onChange={handleConfiguracionChange}>
                             <option value="480p">480p</option>
                             <option value="720p">720p</option>
                             <option value="1080p">1080p</option>
@@ -410,22 +305,13 @@ const IoTAltas = () => {
                       <Col md={4}>
                         <Form.Group style={pageStyles.formGroup}>
                           <Form.Label>FPS</Form.Label>
-                          <Form.Control 
-                            type="number" 
-                            name="fps" 
-                            value={formData.configuracion.fps || ''} 
-                            onChange={handleConfiguracionChange}
-                          />
+                          <Form.Control type="number" name="fps" value={formData.configuracion.fps || ''} onChange={handleConfiguracionChange} />
                         </Form.Group>
                       </Col>
                       <Col md={4}>
                         <Form.Group style={pageStyles.formGroup}>
                           <Form.Label>Almacenamiento</Form.Label>
-                          <Form.Select 
-                            name="almacenamiento" 
-                            value={formData.configuracion.almacenamiento || ''} 
-                            onChange={handleConfiguracionChange}
-                          >
+                          <Form.Select name="almacenamiento" value={formData.configuracion.almacenamiento || ''} onChange={handleConfiguracionChange}>
                             <option value="local">Local</option>
                             <option value="nube">Nube</option>
                             <option value="hibrido">Híbrido</option>
@@ -439,33 +325,10 @@ const IoTAltas = () => {
             )}
             
             <div style={pageStyles.actionButtons}>
-              <Button 
-                variant="outline-secondary" 
-                onClick={() => {
-                  setFormData({
-                    id: '',
-                    nombre: '',
-                    tipo: 'sensor',
-                    ubicacion: '',
-                    conexion: 'wifi',
-                    propietario: '',
-                    descripcion: '',
-                    configuracion: {}
-                  });
-                  setValidated(false);
-                  setShowConfiguracionAvanzada(false);
-                }}
-              >
+              <Button variant="outline-secondary" onClick={() => { setFormData({ id: '', nombre: '', tipo: 'sensor', ubicacion: '', conexion: 'wifi', propietario: '', descripcion: '', configuracion: {} }); setValidated(false); setShowConfiguracionAvanzada(false); }}>
                 Limpiar
               </Button>
-              <Button 
-                variant="primary" 
-                type="submit"
-                style={{ 
-                  backgroundColor: colors.primaryDark,
-                  borderColor: colors.primaryDark
-                }}
-              >
+              <Button variant="primary" type="submit" style={{ backgroundColor: colors.primaryDark, borderColor: colors.primaryDark }}>
                 <FaPlus style={{ marginRight: '5px' }} /> Registrar Dispositivo
               </Button>
             </div>
