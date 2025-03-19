@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
- // Importar la lista de productos
-import { colors, textStyles} from "../../styles/styles"; // Importando estilos del sistema
+import { useNavigate } from "react-router-dom"; // Importamos useNavigate para la navegación
+import productos from "../../services/base"; // Importar la lista de productos
+import { colors, textStyles, buttons } from "../../styles/styles"; // Importando estilos del sistema
 import "bootstrap/dist/css/bootstrap.min.css"; // Importar Bootstrap
 import "bootstrap-icons/font/bootstrap-icons.min.css"; // Importar Bootstrap Icons
 
 const Productos = () => {
+  const navigate = useNavigate(); // Hook para la navegación
   const [filtros, setFiltros] = useState({
-    ordenar: "",
+    ordenar: "",  
     tamaño: "",
     filtracionLuz: "",
     color: "",
@@ -18,32 +20,16 @@ const Productos = () => {
   // Estado para controlar si el panel de filtros está expandido
   const [filtrosExpandidos, setFiltrosExpandidos] = useState(false);
   // Estado para productos filtrados
-  const [productosFiltrados, setProductosFiltrados] = useState([]);
+  const [productosFiltrados, setProductosFiltrados] = useState(productos);
   // Estado para contador de filtros activos
   const [filtrosActivos, setFiltrosActivos] = useState(0);
   // Estado para vista de cuadrícula o lista
   const [vistaGrilla, setVistaGrilla] = useState(true);
-  //Estado para almacenar los productos desde la API
-  const [productos, setProductos] = useState([]);
 
-    // Obtener los productos desde MongoDB al cargar el componente
-    useEffect(() => {
-      const fetchProductos = async () => {
-        try {
-          const response = await fetch('http://localhost:5000/productos'); // Ajusta la URL según tu configuración
-          if (!response.ok) {
-            throw new Error("Error al obtener los productos");
-          }
-          const data = await response.json();
-          setProductos(data);
-          setProductosFiltrados(data);
-        } catch (error) {
-          console.error("Error al obtener los productos:", error);
-        }
-      };
-  
-      fetchProductos();
-    }, []);
+  // Función para navegar al detalle del producto
+  const verDetalleProducto = (productoId) => {
+    navigate(`/producto/${productoId}`);
+  };
 
   const handleChange = (e) => {
     setFiltros({ ...filtros, [e.target.name]: e.target.value });
@@ -532,19 +518,13 @@ const Productos = () => {
         {/* Resultados */}
         {productosFiltrados.length > 0 ? (
           <div className="productResults">
-            {/* Si queremos usar el componente CardsP */}
-            {/* <CardsP productos={productosFiltrados} vistaGrilla={vistaGrilla} /> */}
-            
-            {/* O podemos implementar nuestra propia visualización */}
             <div style={styles.productGrid}>
               {productosFiltrados.map(producto => (
                 <div 
                   key={producto._id} 
                   style={styles.productCard}
-                  onClick={() => window.location.href = `/producto/${producto._id}`}
+                  onClick={() => verDetalleProducto(producto._id)}
                 >
-                  {/* Aquí iría la implementación de la tarjeta de producto */}
-                  {/* Este es solo un placeholder que deberías reemplazar con tus propias tarjetas */}
                   <div style={{
                     padding: vistaGrilla ? "0" : "15px",
                     display: "flex",
@@ -638,18 +618,24 @@ const Productos = () => {
                           </span>
                         </div>
                         
-                        <button style={{
-                          backgroundColor: colors.primaryMedium,
-                          color: colors.white,
-                          border: "none",
-                          borderRadius: "8px",
-                          padding: "8px 15px",
-                          fontSize: "14px",
-                          fontWeight: "600",
-                          cursor: "pointer",
-                          transition: "all 0.2s",
-                        }}>
-                          Ver Mas
+                        <button 
+                          style={{
+                            backgroundColor: colors.primaryMedium,
+                            color: colors.white,
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "8px 15px",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            transition: "all 0.2s",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Evitar que se propague el evento al contenedor
+                            verDetalleProducto(producto._id);
+                          }}
+                        >
+                          Ver Más
                         </button>
                       </div>
                     </div>
