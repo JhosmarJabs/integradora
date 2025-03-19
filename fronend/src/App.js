@@ -13,7 +13,8 @@ import Contacto from './pages/public/Contacto';
 import Login from './pages/public/Login';
 
 //Componentes Privados
-import Dashboard from "./pages/private/DashboardP.js";
+import PrivateLayout from './layouts/PrivateLayout';
+import Privado from './pages/private/Privado';
 import Perfil from "./pages/private/Perfil";
 import Configuracion from "./pages/private/Configuracion";
 
@@ -76,7 +77,7 @@ function App() {
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
 
            {/* Rutas privadas agrupadas */}
-           <Route path="/privado" element={<PrivateLayout />}>
+           <Route path="/" element={<PrivateLayout />}>
             <Route index element={<DashboardP />} />
             <Route path="perfil" element={<Perfil />} />
             <Route path="configuracion" element={<Configuracion />} />
