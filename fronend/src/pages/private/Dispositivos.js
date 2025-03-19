@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Tabs, Tab, Badge } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { colors, typography, textStyles, buttons } from '../../styles/styles';
-import DispositivosList from '../../components/DispositivosList';
+import DispositivosList from '../../components/DispositivosList.js';
 import DispositivoDetail from '../../components/DispositivoDetail';
 
 const Dispositivos = () => {
