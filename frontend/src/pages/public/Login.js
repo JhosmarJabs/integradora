@@ -50,88 +50,82 @@ const Login = () => {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (!loginEmail || !loginPassword) {
-      setError('Por favor, completa todos los campos.');
-      setSuccess('');
-    } else {
-      try {
-          const response = await fetch('http://localhost:5000/login', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                  email: loginEmail,
-                  password: loginPassword
-              })
-          });
-          const data = await response.json();
-          if (response.ok) {
-              setError('');
-              setSuccess('¡Inicio de sesión exitoso!');
-              console.log('Usuario:', data.user);
-              // Simulación de redirección después de un inicio de sesión exitoso
-              setTimeout(() => {
-                  setSuccess('Redireccionando...');
-              }, 1500);
-          } else {
-              setError(data.message || 'Error al iniciar sesión. Inténtalo de nuevo.');
-              setSuccess('');
-          }
-      } catch (error) {
-          setError('Error al iniciar sesión. Inténtalo de nuevo.');
-          setSuccess('');
-      }
-  }
+
+    try {
+      const response = await fetch("http://localhost:5000/login", {
+
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              email: loginEmail,
+              password: loginPassword
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            setSuccess('Inicio de sesión exitoso');
+            localStorage.setItem("token", data.token); // Guardar el token para la sesión
+            localStorage.setItem("role", data.role);  // ✅ Guardar el rol para verificarlo en el App.js
+
+            // Redirigir según el rol
+            window.location.href = data.redirect;
+        } else {
+            setError(data.message || 'Error al iniciar sesión');
+        }
+    } catch (error) {
+        setError('Error en la conexión con el servidor');
+    }
 };
 
-  const handleRegisterSubmit = async (e) => {
-    e.preventDefault();
-    if (!nombre || !apellido || !telefono || !email || !password || !confirmPassword) {
+const handleRegisterSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!nombre || !apellido || !telefono || !email || !password || !confirmPassword) {
       setError('Por favor, completa todos los campos.');
-      setSuccess('');
-    } else if (password !== confirmPassword) {
+      return;
+  }
+
+  if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
-      setSuccess('');
-    } else if (!acceptTerms) {
-      setError('Debes aceptar los Términos de Servicio y la Política de Privacidad para continuar.');
-      setSuccess('');
-    } else {
-      try {
-        const response = await fetch('http://localhost:5000/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: nombre,
-            surname: apellido,
-            phone: telefono,
-            email: email,
-            password: password,
-            role: 'user', // Puedes ajustar esto según tus necesidades
-            status: 'active' // Puedes ajustar esto según tus necesidades
-          })
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setError('');
-          setSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
-          // Simulación de cambio a formulario de login después de un registro exitoso
-          setTimeout(() => {
-            setIsLogin(true);
-            setSuccess('');
-          }, 2000);
+      return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:5000/usuarios", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+          name: nombre, 
+          surname: apellido,
+          phone: telefono,
+          email: email,
+          password: password,
+          role: "user",
+          status: "active"
+      })
+    });
+
+    const data = await response.json();
+    console.log(data);
+
+    if (response.ok) {
+      setSuccess('Registro exitoso. Ahora puedes iniciar sesión.');
+      setTimeout(() => setIsLogin(true), 2000);
         } else {
-          setError(data.message || 'Error al registrar el usuario. Inténtalo de nuevo.');
-          setSuccess('');
+          setError(data.message || 'Error en el registro');
         }
-      } catch (error) {
-        setError('Error al registrar el usuario. Inténtalo de nuevo.');
-        setSuccess('');
-      }
+  } catch (error) {
+    setError('Error al registrar el usuario. Inténtalo de nuevo.');
     }
   };
+
 
   // Verificación de fortaleza de contraseña
   const passwordStrength = (pass) => {
@@ -714,7 +708,6 @@ const Login = () => {
                       Crear Cuenta
                     </Button>
                   </Form>
-                  
                   <div style={styles.switchForm}>
                     ¿Ya tienes una cuenta?{' '}
                     <span style={styles.link} onClick={toggleForm}>
