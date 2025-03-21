@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import persianas from "../../services/persianas"; // Importar la lista de persianas
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.min.css";
-import { colors, textStyles, typography, buttons, layout } from "../../styles/styles"; // Importamos styles.js
 
 const DashboardPersianas = () => {
   const [vistaGrilla, setVistaGrilla] = useState(true);

@@ -23,7 +23,7 @@ function App() {
           {adminRoutes}
         </Routes>
       </div>
-    </Router>
+    </Router> 
   );
 }
 

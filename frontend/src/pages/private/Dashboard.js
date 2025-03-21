@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Button, Form } from 'react-bootstrap';
-import { colors, typography, textStyles } from '../../styles/styles';
 
 const Dashboard = () => {
   // Estados para los datos del dashboard

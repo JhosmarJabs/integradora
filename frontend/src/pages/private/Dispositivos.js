@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-  Container,
   Row,
   Col,
   Card,
   Button,
   Tabs,
-  Tab,
-  Badge,
+  Tab
 } from "react-bootstrap";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import {
   colors,
   typography,
@@ -20,8 +18,6 @@ import DispositivosList from "../../components/DispositivosList.js";
 import DispositivoDetail from "../../components/DispositivoDetail.js";
 
 const Dispositivos = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("lista");
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [devices, setDevices] = useState([]);

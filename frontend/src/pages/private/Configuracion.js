@@ -1,7 +1,5 @@
-import React, { useState } from "react";
 import { Container, Card, Form, Button, Row, Col, Nav, Tab } from "react-bootstrap";
-import { iotStyles,colors } from "../../styles/styles"; // Importamos styles.js
-import { FaArrowLeft, FaTemperatureLow, FaTint, FaWindowMaximize } from 'react-icons/fa';
+import { FaWindowMaximize } from 'react-icons/fa';
 
 const Configuracion = () => {
   return (
