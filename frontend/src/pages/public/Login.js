@@ -52,16 +52,15 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
-
+        const response = await fetch("http://localhost:5000/login", {
             method: "POST",
             headers: {
-              "Content-Type": "application/json"
+                "Content-Type": "application/json"
             },
             credentials: "include",
             body: JSON.stringify({
-              email: loginEmail,
-              password: loginPassword
+                email: loginEmail,
+                password: loginPassword
             })
         });
 
@@ -69,11 +68,16 @@ const Login = () => {
 
         if (response.ok) {
             setSuccess('Inicio de sesión exitoso');
-            localStorage.setItem("token", data.token); // Guardar el token para la sesión
-            localStorage.setItem("role", data.role);  // ✅ Guardar el rol para verificarlo en el App.js
-
-            // Redirigir según el rol
-            window.location.href = data.redirect;
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("role", data.role);
+            
+            // Determinar la redirección basada en el rol
+            const redirectUrl = data.role === 'admin' 
+                ? '/admin/dashboard' 
+                : '/privado/dashboard';
+            
+            // Redireccionar
+            window.location.href = redirectUrl;
         } else {
             setError(data.message || 'Error al iniciar sesión');
         }

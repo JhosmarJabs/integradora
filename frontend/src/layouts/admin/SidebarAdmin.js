@@ -5,9 +5,9 @@ import {
   FaFileAlt, FaQuestionCircle, FaHome, FaSignOutAlt,
   FaChevronDown, FaChevronRight, FaBars
 } from 'react-icons/fa';
-import { colors, typography } from '../styles/styles';
+import { colors, typography } from '../../styles/styles';
 
-const Sidebar = ({ collapsed, onToggle }) => {
+const SidebarAdmin = ({ collapsed, onToggle }) => {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
   
@@ -560,4 +560,4 @@ const Sidebar = ({ collapsed, onToggle }) => {
   );
 };
 
-export default Sidebar;
+export default SidebarAdmin;

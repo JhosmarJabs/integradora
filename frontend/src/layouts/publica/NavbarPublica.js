@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Navbar, Container, Nav, Button, Form, FormControl, NavDropdown, Dropdown } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { colors } from "../styles/styles"; // Importamos estilos
+import { colors } from "../../styles/styles"; // Importamos estilos
 
-const NavbarComponent = () => {
+const NavbarPublica = () => {
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -224,4 +224,4 @@ const NavbarComponent = () => {
   );
 };
 
-export default NavbarComponent;;
+export default NavbarPublica;;

@@ -25,13 +25,19 @@ mongoose.connect(process.env.MONGODB_URI, {
 .catch(err => console.error('Error conectando a MongoDB:', err));
 
 // Importar rutas
+const verificarSesionRuta = require('./routes/verify-session'); // ✅ nueva línea
+
 const loginRuta = require('./routes/loginRuta');
 const usuarioRuta = require('./routes/usuarioRuta');
 const productosRutas = require('./routes/productosRutas');
 const serviciosRuta = require('./routes/serviciosRuta');
 const contactoRuta = require('./routes/contactoRuta');
 
+
 // Usar rutas
+app.use('/verify-session', verificarSesionRuta); // ✅ registrar
+
+app.use('/login', loginRuta);
 app.use('/login', loginRuta);
 app.use('/usuarios', usuarioRuta);
 app.use('/productos', productosRutas);

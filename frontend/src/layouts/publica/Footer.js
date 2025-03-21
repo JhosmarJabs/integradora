@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import { colors } from "../styles/styles"; // Importa los colores desde la guía de estilos
+import { colors } from "../../styles/styles"; // Importa los colores desde la guía de estilos
 
 const Footer = () => {
     return (
