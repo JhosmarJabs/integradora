@@ -24,23 +24,26 @@ const Inicio = () => {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await fetch("http://localhost:5000/productos"); // Ajusta la URL según tu configuración
+        const response = await fetch("http://localhost:5000/productos");
         if (!response.ok) {
           throw new Error("Error al obtener los productos");
         }
         const data = await response.json();
-        setProductos(data);
-
+        
+        // Asegúrate de que estás almacenando un array
+        const productosArray = Array.isArray(data) ? data : (data.data ? data.data : []);
+        setProductos(productosArray);
+    
         // Filtrar productos destacados (con rating alto o descuento)
-        const productosDestacados = data
+        const productosDestacados = productosArray
           .filter(p => p.rating >= 4.7 || p.discount >= 10)
           .slice(0, 4);
         setDestacados(productosDestacados);
-
+    
         // Extraer categorías únicas de productos
-        const categoriasUnicas = [...new Set(data.map(p => p.category))];
+        const categoriasUnicas = [...new Set(productosArray.map(p => p.category))];
         const categoriasData = categoriasUnicas.map(categoria => {
-          const productosCategoria = data.filter(p => p.category === categoria);
+          const productosCategoria = productosArray.filter(p => p.category === categoria);
           return {
             nombre: categoria,
             cantidad: productosCategoria.length,
@@ -763,7 +766,7 @@ const Inicio = () => {
           </div>
           
           <div className="animate-in" style={{animationDelay: "0.3s"}}>
-            <Cards items={destacados.length > 0 ? destacados : productos.slice(0, 4)} />
+            <Cards items={destacados.length > 0 ? destacados : (Array.isArray(productos) ? productos.slice(0, 4) : [])} />
           </div>
         </Container>
       </section>

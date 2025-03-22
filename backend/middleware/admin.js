@@ -1,14 +1,18 @@
-// middleware/admin.js
-module.exports = function(req, res, next) {
-    // req.usuario viene del middleware de autenticación 'auth'
-    
-    // Verificar el rol del usuario
+const admin = (req, res, next) => {
+    // Verificar que haya un usuario (asumiendo que el middleware auth ya se ejecutó)
+    if (!req.usuario) {
+        return res.status(401).json({ message: 'Autenticación requerida.' });
+    }
+
+    // Verificar si el usuario es administrador
     if (req.usuario.role !== 'admin') {
         return res.status(403).json({ 
-            success: false, 
-            message: 'Acceso denegado. Se requiere rol de administrador.' 
+            message: 'Acceso denegado. Se requieren privilegios de administrador.' 
         });
     }
-    
+
+    // Si es administrador, continuar
     next();
 };
+
+module.exports = admin;

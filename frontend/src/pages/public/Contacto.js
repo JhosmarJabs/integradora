@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { colors, textStyles, layout, buttons } from '../../styles/styles';
-import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
+import { API_URL } from '../../config';
 
 const Contacto = () => {
+  // Estados para el formulario
   const [formState, setFormState] = useState({
     nombre: '',
     email: '',
@@ -12,6 +14,94 @@ const Contacto = () => {
   
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Estados para datos dinámicos
+  const [contactInfo, setContactInfo] = useState([]);
+  const [socialNetworks, setSocialNetworks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [dataError, setDataError] = useState(false);
+
+  // Obtener datos de contacto y redes sociales
+  useEffect(() => {
+    const fetchContactData = async () => {
+      try {
+        setLoading(true);
+        
+        // Obtener información de contacto
+        const contactResponse = await fetch(`${API_URL}/contacto/info`);
+        if (!contactResponse.ok) {
+          throw new Error('Error al cargar información de contacto');
+        }
+        const contactData = await contactResponse.json();
+        setContactInfo(contactData);
+        
+        // Obtener redes sociales
+        const socialResponse = await fetch(`${API_URL}/redes-sociales`);
+        if (!socialResponse.ok) {
+          throw new Error('Error al cargar redes sociales');
+        }
+        const socialData = await socialResponse.json();
+        setSocialNetworks(socialData);
+        
+        setDataError(false);
+      } catch (error) {
+        console.error('Error al cargar datos:', error);
+        setDataError(true);
+        
+        // Si hay error, cargar datos de respaldo para que la página no se vea vacía
+        setContactInfo([
+          {
+            icon: "📍",
+            title: "Dirección",
+            content: "Calle Principal #123, Huejutla de Reyes, Hidalgo, México",
+            link: "https://maps.app.goo.gl/UzrK1BW2QVNirmmt8",
+            linkText: "Ver en Google Maps"
+          },
+          {
+            icon: "📞",
+            title: "Teléfono",
+            content: "+52 123 456 7890 (Oficina Principal)\n+52 987 654 3210 (Atención al Cliente)"
+          },
+          {
+            icon: "📧",
+            title: "Correo Electrónico",
+            content: "info@jadacompany.com (Consultas Generales)\nventas@jadacompany.com (Solicitudes de Presupuesto)"
+          },
+          {
+            icon: "🕒",
+            title: "Horario de Atención",
+            content: "Lunes a Viernes: 9:00 AM - 6:00 PM\nSábados: 10:00 AM - 2:00 PM\nDomingos y Festivos: Cerrado"
+          }
+        ]);
+        
+        setSocialNetworks([
+          {
+            icon: "📱",
+            name: "Facebook",
+            handle: "JADA Company",
+            url: "https://facebook.com/jadacompany"
+          },
+          {
+            icon: "📷",
+            name: "Instagram",
+            handle: "@JADACompany",
+            url: "https://instagram.com/jadacompany"
+          },
+          {
+            icon: "🔗",
+            name: "LinkedIn",
+            handle: "JADA Company",
+            url: "https://linkedin.com/company/jadacompany"
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContactData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -23,28 +113,46 @@ const Contacto = () => {
 
   const enviarContacto = async (contacto) => {
     try {
-      const response = await fetch('http://localhost:5000/contacto', {
+      const response = await fetch(`${API_URL}/contacto`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(contacto)
       });
-      return response.ok;
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.mensaje || 'Error al enviar el contacto');
+      }
+      
+      return { success: true };
     } catch (error) {
       console.error('Error al enviar el contacto:', error);
-      return false;
+      return { 
+        success: false, 
+        message: error.message || 'Error al enviar el contacto. Inténtalo de nuevo más tarde.'
+      };
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulación de envío de formulario
-    if (formState.nombre && formState.email && formState.mensaje) {
-      const exito = await enviarContacto(formState);
-      if (exito) {
+    setFormError(false);
+    setErrorMessage('');
+    
+    // Validación básica
+    if (!formState.nombre || !formState.email || !formState.mensaje) {
+      setFormError(true);
+      setErrorMessage('Por favor completa todos los campos requeridos (nombre, email y mensaje).');
+      return;
+    }
+    
+    // Enviar datos a la API
+    const result = await enviarContacto(formState);
+    
+    if (result.success) {
       setFormSubmitted(true);
-      setFormError(false);
       setFormState({
         nombre: '',
         email: '',
@@ -53,9 +161,7 @@ const Contacto = () => {
       });
     } else {
       setFormError(true);
-    }
-    } else {
-      setFormError(true);
+      setErrorMessage(result.message);
     }
   };
 
@@ -179,56 +285,16 @@ const Contacto = () => {
       boxShadow: '0 6px 20px rgba(13, 27, 42, 0.1)',
       width: '100%',
       height: '450px',
+    },
+    loadingContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '200px',
     }
   };
 
-  // Información de contacto en tarjetas separadas
-  const contactInfo = [
-    {
-      icon: "📍",
-      title: "Dirección",
-      content: "Calle Principal #123, Huejutla de Reyes, Hidalgo, México",
-      link: "https://maps.app.goo.gl/UzrK1BW2QVNirmmt8",
-      linkText: "Ver en Google Maps"
-    },
-    {
-      icon: "📞",
-      title: "Teléfono",
-      content: "+52 123 456 7890 (Oficina Principal)\n+52 987 654 3210 (Atención al Cliente)"
-    },
-    {
-      icon: "📧",
-      title: "Correo Electrónico",
-      content: "info@jadacompany.com (Consultas Generales)\nventas@jadacompany.com (Solicitudes de Presupuesto)"
-    },
-    {
-      icon: "🕒",
-      title: "Horario de Atención",
-      content: "Lunes a Viernes: 9:00 AM - 6:00 PM\nSábados: 10:00 AM - 2:00 PM\nDomingos y Festivos: Cerrado"
-    }
-  ];
-
   // Redes sociales
-  const socialNetworks = [
-    {
-      icon: "📱",
-      name: "Facebook",
-      handle: "JADA Company",
-      url: "https://facebook.com/jadacompany"
-    },
-    {
-      icon: "📷",
-      name: "Instagram",
-      handle: "@JADACompany",
-      url: "https://instagram.com/jadacompany"
-    },
-    {
-      icon: "🔗",
-      name: "LinkedIn",
-      handle: "JADA Company",
-      url: "https://linkedin.com/company/jadacompany"
-    }
-  ];
 
   return (
     <div style={{ backgroundColor: colors.white, color: colors.primaryDark }}>
@@ -275,48 +341,62 @@ const Contacto = () => {
         </Row>
         
         <Row style={{marginBottom: '50px'}}>
-          {contactInfo.map((info, index) => (
-            <Col md={6} lg={3} key={index} className="mb-4">
-              <div style={styles.infoCard}>
-                <h3 style={{
-                  fontSize: '20px',
-                  marginBottom: '15px',
-                  color: colors.primaryDark,
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  <span style={styles.infoIcon}>{info.icon}</span>
-                  {info.title}
-                </h3>
-                <p style={{
-                  ...styles.paragraph,
-                  whiteSpace: 'pre-line'
-                }}>
-                  {info.content}
-                </p>
-                {info.link && (
-                  <a 
-                    href={info.link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    style={{
-                      color: colors.primaryLight,
-                      fontWeight: 600,
-                      textDecoration: 'none',
-                      display: 'inline-block',
-                      marginTop: '8px',
-                      transition: 'color 0.3s ease',
-                      '&:hover': {
-                        color: colors.primaryDark,
-                      }
-                    }}
-                  >
-                    {info.linkText} →
-                  </a>
-                )}
-              </div>
+          {loading ? (
+            <div style={styles.loadingContainer}>
+              <Spinner animation="border" role="status" variant="primary">
+                <span className="visually-hidden">Cargando...</span>
+              </Spinner>
+            </div>
+          ) : dataError ? (
+            <Col>
+              <Alert variant="warning">
+                No se pudo cargar la información de contacto. Por favor, intenta más tarde.
+              </Alert>
             </Col>
-          ))}
+          ) : (
+            contactInfo.map((info, index) => (
+              <Col md={6} lg={3} key={index} className="mb-4">
+                <div style={styles.infoCard}>
+                  <h3 style={{
+                    fontSize: '20px',
+                    marginBottom: '15px',
+                    color: colors.primaryDark,
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <span style={styles.infoIcon}>{info.icon}</span>
+                    {info.title}
+                  </h3>
+                  <p style={{
+                    ...styles.paragraph,
+                    whiteSpace: 'pre-line'
+                  }}>
+                    {info.content}
+                  </p>
+                  {info.link && (
+                    <a 
+                      href={info.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{
+                        color: colors.primaryLight,
+                        fontWeight: 600,
+                        textDecoration: 'none',
+                        display: 'inline-block',
+                        marginTop: '8px',
+                        transition: 'color 0.3s ease',
+                        '&:hover': {
+                          color: colors.primaryDark,
+                        }
+                      }}
+                    >
+                      {info.linkText} →
+                    </a>
+                  )}
+                </div>
+              </Col>
+            ))
+          )}
         </Row>
 
         <Row style={styles.section}>
@@ -357,7 +437,7 @@ const Contacto = () => {
                 padding: '16px 20px'
               }}>
                 <Alert.Heading>Error en el formulario</Alert.Heading>
-                <p>Por favor completa todos los campos requeridos (nombre, email y mensaje).</p>
+                <p>{errorMessage || 'Por favor completa todos los campos requeridos (nombre, email y mensaje).'}</p>
               </Alert>
             )}
             
@@ -436,8 +516,20 @@ const Contacto = () => {
               <Button 
                 type="submit"
                 style={styles.button}
+                disabled={loading}
               >
-                Enviar Mensaje
+                {loading ? (
+                  <>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                    <span className="ms-2">Procesando...</span>
+                  </>
+                ) : 'Enviar Mensaje'}
               </Button>
             </Form>
           </Col>
@@ -462,21 +554,33 @@ const Contacto = () => {
             </p>
             
             <div>
-              {socialNetworks.map((social, index) => (
-                <a 
-                  key={index}
-                  href={social.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  style={styles.socialLink}
-                >
-                  <span style={{fontSize: '24px', marginRight: '15px'}}>{social.icon}</span>
-                  <div>
-                    <strong style={{display: 'block', fontSize: '18px'}}>{social.name}</strong>
-                    <span style={{fontSize: '14px'}}>{social.handle}</span>
-                  </div>
-                </a>
-              ))}
+              {loading ? (
+                <div style={styles.loadingContainer}>
+                  <Spinner animation="border" role="status" variant="primary">
+                    <span className="visually-hidden">Cargando...</span>
+                  </Spinner>
+                </div>
+              ) : dataError ? (
+                <Alert variant="warning">
+                  No se pudo cargar la información de redes sociales. Por favor, intenta más tarde.
+                </Alert>
+              ) : (
+                socialNetworks.map((social, index) => (
+                  <a 
+                    key={index}
+                    href={social.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={styles.socialLink}
+                  >
+                    <span style={{fontSize: '24px', marginRight: '15px'}}>{social.icon}</span>
+                    <div>
+                      <strong style={{display: 'block', fontSize: '18px'}}>{social.name}</strong>
+                      <span style={{fontSize: '14px'}}>{social.handle}</span>
+                    </div>
+                  </a>
+                ))
+              )}
             </div>
             
             <Card style={{

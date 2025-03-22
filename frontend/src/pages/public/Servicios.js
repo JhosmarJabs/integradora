@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { colors, textStyles, layout, buttons } from '../../styles/styles';
-import { Container, Row, Col, Card, Image, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Image, Spinner, Alert } from 'react-bootstrap';
+import { API_URL } from '../../config';
 
 // Iconos para los servicios (reemplazar por componentes reales de iconos si están disponibles)
 const ServiceIcons = {
@@ -20,24 +21,87 @@ const Servicios = () => {
   const [animate, setAnimate] = useState(false);
   const [hoveredService, setHoveredService] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
-  const [servicios, setServicios] = useState([]); // Estado para almacenar los servicios desde la API
+  
+  // Estados para manejo de datos
+  const [servicios, setServicios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [beneficios, setBeneficios] = useState([]);
+  const [loadingBeneficios, setLoadingBeneficios] = useState(true);
+  const [errorBeneficios, setErrorBeneficios] = useState(null);
 
   // Obtener los servicios desde la API
   useEffect(() => {
     const fetchServicios = async () => {
       try {
-        const response = await fetch("http://localhost:5000/servicios"); // Ajusta la URL según tu configuración
+        setLoading(true);
+        const response = await fetch(`${API_URL}/servicios`);
+        
         if (!response.ok) {
-          throw new Error("Error al obtener los servicios");
+          throw new Error(`Error al obtener los servicios: ${response.status} ${response.statusText}`);
         }
+        
         const data = await response.json();
         setServicios(data);
+        setError(null);
       } catch (error) {
         console.error("Error al obtener los servicios:", error);
+        setError("No se pudieron cargar los servicios. Por favor, intenta más tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchBeneficios = async () => {
+      try {
+        setLoadingBeneficios(true);
+        const response = await fetch(`${API_URL}/beneficios`);
+        
+        if (!response.ok) {
+          throw new Error(`Error al obtener los beneficios: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setBeneficios(data);
+        setErrorBeneficios(null);
+      } catch (error) {
+        console.error("Error al obtener los beneficios:", error);
+        setErrorBeneficios("No se pudieron cargar los beneficios. Por favor, intenta más tarde.");
+        
+        // Cargar beneficios de respaldo
+        setBeneficios([
+          { 
+            id: 'calidad',
+            title: "Calidad Garantizada", 
+            desc: "Utilizamos materiales de primera calidad y tecnología avanzada en todos nuestros productos y servicios.",
+            icon: "⭐"
+          },
+          { 
+            id: 'atencion',
+            title: "Atención Personalizada", 
+            desc: "Nos adaptamos a tus necesidades y preferencias, ofreciendo soluciones diseñadas específicamente para ti.",
+            icon: "👥"
+          },
+          { 
+            id: 'ambiente',
+            title: "Compromiso con el Medio Ambiente", 
+            desc: "Ofrecemos opciones ecológicas y sostenibles que minimizan el impacto ambiental sin sacrificar calidad.",
+            icon: "🌱"
+          },
+          { 
+            id: 'precios',
+            title: "Precios Competitivos", 
+            desc: "Soluciones de alta calidad a precios accesibles para adaptarnos a diferentes presupuestos.",
+            icon: "💰"
+          },
+        ]);
+      } finally {
+        setLoadingBeneficios(false);
       }
     };
 
     fetchServicios();
+    fetchBeneficios();
   }, []);
 
   // Activar animaciones al cargar el componente
@@ -73,6 +137,22 @@ const Servicios = () => {
       backgroundImage: `radial-gradient(${colors.white} 1px, transparent 1px)`,
       backgroundSize: '20px 20px',
       opacity: 0.1,
+    },
+    
+    // Estados de carga y error
+    loadingContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '200px',
+      width: '100%',
+    },
+    errorContainer: {
+      padding: '20px',
+      borderRadius: '10px',
+      backgroundColor: 'rgba(220, 53, 69, 0.1)',
+      border: '1px solid rgba(220, 53, 69, 0.2)',
+      marginBottom: '30px',
     },
     
     // Tarjetas y elementos con sombra
@@ -180,34 +260,31 @@ const Servicios = () => {
     }
   };
 
-  // Datos para beneficios
-  const benefitsData = [
-    { 
-      id: 'calidad',
-      title: "Calidad Garantizada", 
-      content: "Utilizamos materiales de primera calidad y tecnología avanzada en todos nuestros productos y servicios.",
-    },
-    { 
-      id: 'atencion',
-      title: "Atención Personalizada", 
-      content: "Nos adaptamos a tus necesidades y preferencias, ofreciendo soluciones diseñadas específicamente para ti.",
-    },
-    { 
-      id: 'ambiente',
-      title: "Compromiso con el Medio Ambiente", 
-      content: "Ofrecemos opciones ecológicas y sostenibles que minimizan el impacto ambiental sin sacrificar calidad.",
-    },
-    { 
-      id: 'precios',
-      title: "Precios Competitivos", 
-      content: "Soluciones de alta calidad a precios accesibles para adaptarnos a diferentes presupuestos.",
-    },
-  ];
-
   // Función para renderizar cards de beneficios con animación optimizada
   const renderBenefitCards = useCallback(() => {
-    return benefitsData.map((item, index) => (
-      <Col md={3} key={index} className="mb-4 mb-md-0">
+    if (loadingBeneficios) {
+      return (
+        <div style={styles.loadingContainer}>
+          <Spinner animation="border" role="status" variant="primary">
+            <span className="visually-hidden">Cargando beneficios...</span>
+          </Spinner>
+        </div>
+      );
+    }
+
+    if (errorBeneficios && beneficios.length === 0) {
+      return (
+        <div style={styles.errorContainer}>
+          <Alert variant="danger">
+            <Alert.Heading>Error al cargar los beneficios</Alert.Heading>
+            <p>{errorBeneficios}</p>
+          </Alert>
+        </div>
+      );
+    }
+
+    return beneficios.map((item, index) => (
+      <Col md={3} key={item._id || index} className="mb-4 mb-md-0">
         <div 
           style={{ 
             ...styles.slideUp(0.5 + (index * 0.1)),
@@ -230,7 +307,7 @@ const Servicios = () => {
                 transition: 'transform 0.3s ease',
                 transform: hoveredCard === index ? 'scale(1.1)' : 'scale(1)',
               }}>
-                {ServiceIcons[item.id]}
+                {item.icon || ServiceIcons[item.id]}
               </div>
               <Card.Title style={{ 
                 fontFamily: textStyles.title.fontFamily, 
@@ -243,7 +320,7 @@ const Servicios = () => {
                 {item.title}
               </Card.Title>
               <Card.Text style={{ fontSize: '16px', lineHeight: '1.6', flex: 1 }}>
-                {item.content}
+                {item.desc || item.content}
               </Card.Text>
               {hoveredCard === index && (
                 <div 
@@ -262,10 +339,39 @@ const Servicios = () => {
         </div>
       </Col>
     ));
-  }, [hoveredCard, animate, styles]);
+  }, [hoveredCard, animate, styles, beneficios, loadingBeneficios, errorBeneficios]);
 
   // Función para renderizar servicios con animación optimizada
   const renderServicios = useCallback(() => {
+    if (loading) {
+      return (
+        <div style={styles.loadingContainer}>
+          <Spinner animation="border" role="status" variant="primary">
+            <span className="visually-hidden">Cargando servicios...</span>
+          </Spinner>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div style={styles.errorContainer}>
+          <Alert variant="danger">
+            <Alert.Heading>Error al cargar los servicios</Alert.Heading>
+            <p>{error}</p>
+          </Alert>
+        </div>
+      );
+    }
+
+    if (servicios.length === 0) {
+      return (
+        <Alert variant="info">
+          No hay servicios disponibles en este momento. Por favor, revisa más tarde.
+        </Alert>
+      );
+    }
+
     return servicios.map((servicio, index) => {
       // Alterna el orden de la imagen y el texto basado en el índice par/impar
       const isEven = index % 2 === 0;
@@ -290,12 +396,16 @@ const Servicios = () => {
               onMouseLeave={() => setHoveredService(null)}
             >
               <Image
-                src={servicio.imagen}
+                src={`${API_URL}${servicio.imagen}`}
                 alt={servicio.titulo}
                 fluid
                 style={{
                   ...styles.image,
                   transform: hoveredService === servicio._id ? 'scale(1.05)' : 'scale(1)',
+                }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://via.placeholder.com/800x500?text=Imagen+no+disponible';
                 }}
               />
               {hoveredService === servicio._id && (
@@ -346,7 +456,7 @@ const Servicios = () => {
               <p style={styles.paragraph}>
                 {servicio.descripcion}
               </p>
-              {servicio.listItems.length > 0 && (
+              {servicio.listItems && servicio.listItems.length > 0 && (
                 <ul style={{ paddingLeft: '20px' }}>
                   {servicio.listItems.map((item, idx) => (
                     <li key={idx} style={styles.listItem}>
@@ -404,7 +514,7 @@ const Servicios = () => {
         </Row>
       );
     });
-  }, [hoveredService, animate, styles]);
+  }, [hoveredService, animate, styles, servicios, loading, error]);
 
   return (
     <div style={{ backgroundColor: colors.white, color: colors.primaryDark }}>

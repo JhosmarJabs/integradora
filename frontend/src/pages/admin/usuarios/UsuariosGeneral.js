@@ -1,91 +1,111 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Button, Form, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Button, Form, Badge, Spinner, Alert } from 'react-bootstrap';
 import { colors, textStyles } from '../../../styles/styles';
+import { API_URL } from '../../../config';
 
 const UsuariosGeneral = () => {
   const [usuarios, setUsuarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filtro, setFiltro] = useState('');
   const [rolFiltro, setRolFiltro] = useState('');
   
-  // Simular carga de datos
+  // Cargar usuarios desde la API
   useEffect(() => {
-    // Datos de ejemplo
-    const datosUsuarios = [
-      { 
-        id: '1', 
-        nombre: 'Juan', 
-        apellido: 'Pérez', 
-        email: 'juan.perez@ejemplo.com', 
-        telefono: '555-1234', 
-        rol: 'admin',
-        activo: true,
-        fechaRegistro: '2023-01-15'
-      },
-      { 
-        id: '2', 
-        nombre: 'María', 
-        apellido: 'López', 
-        email: 'maria.lopez@ejemplo.com', 
-        telefono: '555-5678', 
-        rol: 'cliente',
-        activo: true,
-        fechaRegistro: '2023-02-20'
-      },
-      { 
-        id: '3', 
-        nombre: 'Carlos', 
-        apellido: 'Rodríguez', 
-        email: 'carlos.rodriguez@ejemplo.com', 
-        telefono: '555-9012', 
-        rol: 'vendedor',
-        activo: true,
-        fechaRegistro: '2023-03-10'
-      },
-      { 
-        id: '4', 
-        nombre: 'Ana', 
-        apellido: 'García', 
-        email: 'ana.garcia@ejemplo.com', 
-        telefono: '555-3456', 
-        rol: 'cliente',
-        activo: false,
-        fechaRegistro: '2023-04-05'
-      },
-      { 
-        id: '5', 
-        nombre: 'Roberto', 
-        apellido: 'Fernández', 
-        email: 'roberto.fernandez@ejemplo.com', 
-        telefono: '555-7890', 
-        rol: 'admin',
-        activo: true,
-        fechaRegistro: '2023-05-18'
+    const fetchUsuarios = async () => {
+      try {
+        setLoading(true);
+        
+        // Obtener token de autenticación del localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No se ha iniciado sesión o la sesión ha expirado');
+        }
+        
+        // URL corregida - usando la ruta correcta según la estructura de la API
+        const response = await fetch(`${API_URL}/usuario`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error al obtener usuarios: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log("Datos recibidos:", data);
+        setUsuarios(data);
+        setError(null);
+      } catch (error) {
+        console.error("Error al obtener usuarios:", error);
+        setError("No se pudieron cargar los usuarios. " + error.message);
+        setUsuarios([]);
+      } finally {
+        setLoading(false);
       }
-    ];
-    
-    setUsuarios(datosUsuarios);
+    };
+
+    fetchUsuarios();
   }, []);
+  
+  // Función para cambiar el estado (activar/desactivar) de un usuario
+  const cambiarEstadoUsuario = async (id, nuevoEstado) => {
+    try {
+      // Obtener token de autenticación del localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No se ha iniciado sesión o la sesión ha expirado');
+      }
+      
+      // URL corregida para la actualización
+      const response = await fetch(`${API_URL}/usuario/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: nuevoEstado ? 'active' : 'inactive' })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error al actualizar usuario: ${response.status} ${response.statusText}`);
+      }
+      
+      // Actualizar la lista de usuarios en el estado
+      setUsuarios(usuarios.map(user => 
+        user._id === id ? { ...user, status: nuevoEstado ? 'active' : 'inactive' } : user
+      ));
+      
+    } catch (error) {
+      console.error("Error al cambiar estado del usuario:", error);
+      alert("Error al cambiar el estado del usuario: " + error.message);
+    }
+  };
   
   // Filtrar usuarios
   const usuariosFiltrados = usuarios.filter(usuario => {
-    const nombreCompleto = `${usuario.nombre} ${usuario.apellido}`.toLowerCase();
+    // Verificar si el usuario tiene las propiedades necesarias
+    if (!usuario || !usuario.name) return false;
+    
+    const nombreCompleto = `${usuario.name} ${usuario.surname || ''}`.toLowerCase();
     const coincideTexto = nombreCompleto.includes(filtro.toLowerCase()) || 
-                         usuario.email.toLowerCase().includes(filtro.toLowerCase());
-    const coincideRol = rolFiltro === '' || usuario.rol === rolFiltro;
+                         (usuario.email && usuario.email.toLowerCase().includes(filtro.toLowerCase()));
+    const coincideRol = rolFiltro === '' || usuario.role === rolFiltro;
     return coincideTexto && coincideRol;
   });
   
   // Obtener roles únicos para el filtro
-  const roles = [...new Set(usuarios.map(u => u.rol))];
+  const roles = [...new Set(usuarios.map(u => u.role).filter(Boolean))];
   
   // Estadísticas de usuarios
   const estadisticas = {
     total: usuarios.length,
-    activos: usuarios.filter(u => u.activo).length,
-    inactivos: usuarios.filter(u => !u.activo).length,
-    administradores: usuarios.filter(u => u.rol === 'admin').length,
-    clientes: usuarios.filter(u => u.rol === 'cliente').length,
-    vendedores: usuarios.filter(u => u.rol === 'vendedor').length
+    activos: usuarios.filter(u => u.status === 'active').length,
+    inactivos: usuarios.filter(u => u.status !== 'active').length,
+    administradores: usuarios.filter(u => u.role === 'admin').length,
+    clientes: usuarios.filter(u => u.role === 'user').length,
+    vendedores: usuarios.filter(u => u.role === 'staff').length
   };
   
   // Estilos
@@ -110,8 +130,63 @@ const UsuariosGeneral = () => {
       fontSize: '24px',
       fontWeight: 'bold',
       color: colors.primaryDark
+    },
+    loadingContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '300px',
+      width: '100%',
+      textAlign: 'center',
+    },
+    errorContainer: {
+      padding: '20px',
+      marginBottom: '20px',
+      borderRadius: '8px',
     }
   };
+  
+  // Renderizar carga
+  if (loading) {
+    return (
+      <Container fluid style={{ padding: '30px 20px' }}>
+        <div style={pageStyles.loadingContainer}>
+          <Spinner animation="border" role="status" variant="primary" style={{ marginBottom: '20px' }}>
+            <span className="visually-hidden">Cargando usuarios...</span>
+          </Spinner>
+          <p style={{ fontSize: '18px', color: colors.primaryMedium }}>Cargando información de usuarios...</p>
+        </div>
+      </Container>
+    );
+  }
+
+  // Renderizar error
+  if (error) {
+    return (
+      <Container fluid style={{ padding: '30px 20px' }}>
+        <Alert variant="danger" style={pageStyles.errorContainer}>
+          <Alert.Heading>Error al cargar usuarios</Alert.Heading>
+          <p>{error}</p>
+          <hr />
+          <div className="d-flex justify-content-between">
+            <Button 
+              variant="outline-danger"
+              onClick={() => window.location.reload()}
+            >
+              Intentar nuevamente
+            </Button>
+            <Button 
+              variant="outline-primary"
+              onClick={() => window.history.back()}
+            >
+              Volver atrás
+            </Button>
+          </div>
+        </Alert>
+      </Container>
+    );
+  }
   
   return (
     <Container fluid style={{ padding: '30px 20px' }}>
@@ -179,7 +254,12 @@ const UsuariosGeneral = () => {
           >
             <option value="">Todos los roles</option>
             {roles.map((rol, idx) => (
-              <option key={idx} value={rol}>{rol.charAt(0).toUpperCase() + rol.slice(1)}</option>
+              <option key={idx} value={rol}>
+                {rol === 'admin' ? 'Administrador' : 
+                 rol === 'user' ? 'Cliente' : 
+                 rol === 'staff' ? 'Vendedor' : 
+                 rol.charAt(0).toUpperCase() + rol.slice(1)}
+              </option>
             ))}
           </Form.Select>
         </Col>
@@ -189,66 +269,81 @@ const UsuariosGeneral = () => {
       <Card style={pageStyles.card}>
         <Card.Body>
           <Card.Title className="mb-4">Listado de Usuarios</Card.Title>
-          <Table responsive hover>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Fecha Registro</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {usuariosFiltrados.map((usuario) => (
-                <tr key={usuario.id}>
-                  <td>{usuario.id}</td>
-                  <td>{`${usuario.nombre} ${usuario.apellido}`}</td>
-                  <td>{usuario.email}</td>
-                  <td>{usuario.telefono}</td>
-                  <td>
-                    <Badge bg={
-                      usuario.rol === 'admin' ? 'danger' : 
-                      usuario.rol === 'vendedor' ? 'warning' : 'info'
-                    }>
-                      {usuario.rol.charAt(0).toUpperCase() + usuario.rol.slice(1)}
-                    </Badge>
-                  </td>
-                  <td>
-                    <Badge bg={usuario.activo ? 'success' : 'secondary'}>
-                      {usuario.activo ? 'Activo' : 'Inactivo'}
-                    </Badge>
-                  </td>
-                  <td>{usuario.fechaRegistro}</td>
-                  <td>
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm" 
-                      className="me-2"
-                    >
-                      Ver
-                    </Button>
-                    <Button 
-                      variant="outline-secondary" 
-                      size="sm"
-                      className="me-2"
-                    >
-                      Editar
-                    </Button>
-                    <Button 
-                      variant={usuario.activo ? 'outline-warning' : 'outline-success'} 
-                      size="sm"
-                    >
-                      {usuario.activo ? 'Desactivar' : 'Activar'}
-                    </Button>
-                  </td>
+          {usuariosFiltrados.length === 0 ? (
+            <Alert variant="info">
+              No se encontraron usuarios con los criterios de búsqueda especificados.
+            </Alert>
+          ) : (
+            <Table responsive hover>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Email</th>
+                  <th>Teléfono</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th>Fecha Registro</th>
+                  <th>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {usuariosFiltrados.map((usuario) => (
+                  <tr key={usuario._id}>
+                    <td>{usuario._id.substring(0, 8)}...</td>
+                    <td>{`${usuario.name} ${usuario.surname || ''}`}</td>
+                    <td>{usuario.email}</td>
+                    <td>{usuario.phone || 'N/A'}</td>
+                    <td>
+                      <Badge bg={
+                        usuario.role === 'admin' ? 'danger' : 
+                        usuario.role === 'staff' ? 'warning' : 'info'
+                      }>
+                        {usuario.role === 'admin' ? 'Administrador' : 
+                         usuario.role === 'user' ? 'Cliente' : 
+                         usuario.role === 'staff' ? 'Vendedor' : 
+                         usuario.role}
+                      </Badge>
+                    </td>
+                    <td>
+                      <Badge bg={usuario.status === 'active' ? 'success' : 'secondary'}>
+                        {usuario.status === 'active' ? 'Activo' : 
+                         usuario.status === 'inactive' ? 'Inactivo' : 
+                         usuario.status === 'suspended' ? 'Suspendido' : 
+                         usuario.status}
+                      </Badge>
+                    </td>
+                    <td>{usuario.date ? new Date(usuario.date).toLocaleDateString() : 'N/A'}</td>
+                    <td>
+                      <Button 
+                        variant="outline-primary" 
+                        size="sm" 
+                        className="me-2"
+                        onClick={() => window.location.href = `/admin/usuarios/${usuario._id}`}
+                      >
+                        Ver
+                      </Button>
+                      <Button 
+                        variant="outline-secondary" 
+                        size="sm"
+                        className="me-2"
+                        onClick={() => window.location.href = `/admin/usuarios/editar/${usuario._id}`}
+                      >
+                        Editar
+                      </Button>
+                      <Button 
+                        variant={usuario.status === 'active' ? 'outline-warning' : 'outline-success'} 
+                        size="sm"
+                        onClick={() => cambiarEstadoUsuario(usuario._id, usuario.status !== 'active')}
+                      >
+                        {usuario.status === 'active' ? 'Desactivar' : 'Activar'}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
         </Card.Body>
       </Card>
     </Container>

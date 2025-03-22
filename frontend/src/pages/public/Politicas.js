@@ -1,134 +1,36 @@
-import React, { useEffect } from 'react';
-import { Container, Row, Col, Card, Accordion } from 'react-bootstrap';
-import { colors, textStyles, typography, layout } from '../../styles/styles';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Accordion, Spinner, Alert, Button  } from 'react-bootstrap';
+import { colors, textStyles, typography  } from '../../styles/styles';
+import { API_URL } from '../../config';
 
-const Politicas = ({ data }) => {
-  // Configuración predeterminada en caso de que no se proporcionen datos
-  const defaultData = {
-    pageTitle: "Políticas de JADA Company",
-    pageIntro: "En JADA Company nos esforzamos por mantener los más altos estándares éticos y profesionales. Nuestras políticas reflejan nuestro compromiso con la transparencia, calidad y satisfacción del cliente.",
-    
-    clientPolicies: {
-      title: "Políticas del Cliente",
-      intro: "Tu satisfacción es nuestra prioridad. Estas políticas están diseñadas para garantizar una experiencia de compra segura y transparente.",
-      items: [
-        {
-          id: "guarantee",
-          icon: "🛡️",
-          title: "Garantía de Calidad",
-          content: [
-            "Todos nuestros productos cuentan con una garantía de 2 años contra defectos de fabricación. Si encuentras algún problema con tu producto, contáctanos y resolveremos la situación de manera rápida y eficiente.",
-            "Nuestro equipo de atención al cliente está disponible para asistirte y proporcionarte toda la información necesaria sobre cómo hacer válida tu garantía."
-          ],
-          highlights: ["garantía de 2 años"]
-        },
-        {
-          id: "returns",
-          icon: "↩️",
-          title: "Devoluciones y Reembolsos",
-          content: [
-            "Aceptamos devoluciones dentro de los 30 días posteriores a la compra, siempre que el producto esté en su estado original y con el embalaje intacto.",
-            "Los reembolsos se procesarán en un plazo máximo de 14 días hábiles después de recibir el producto devuelto. Te notificaremos por correo electrónico una vez que se haya procesado tu reembolso."
-          ],
-          highlights: ["30 días posteriores a la compra"]
-        },
-        {
-          id: "service",
-          icon: "🔧",
-          title: "Servicio Postventa",
-          content: [
-            "Ofrecemos un servicio de mantenimiento y reparación para garantizar que tus productos sigan funcionando perfectamente.",
-            "Si necesitas asistencia, nuestro equipo estará disponible para ayudarte de lunes a viernes de 9:00 AM a 6:00 PM. Puedes contactarnos a través de nuestro formulario en línea, por teléfono o por correo electrónico."
-          ],
-          highlights: ["lunes a viernes de 9:00 AM a 6:00 PM"]
-        },
-        {
-          id: "pricing",
-          icon: "💲",
-          title: "Transparencia en Precios",
-          content: [
-            "Todos nuestros precios incluyen IVA y están claramente detallados en nuestras facturas y presupuestos. No hay cargos ocultos; te informamos de cualquier costo adicional antes de confirmar tu pedido.",
-            "Nuestra política de precios está diseñada para ser justa y transparente, permitiéndote tomar decisiones informadas sobre tus compras."
-          ],
-          highlights: ["No hay cargos ocultos"]
-        }
-      ]
-    },
-    
-    companyPolicies: {
-      title: "Políticas de la Empresa",
-      intro: "Nos regimos por principios éticos y profesionales que guían nuestras operaciones y relaciones con clientes, proveedores y empleados.",
-      items: [
-        {
-          id: "quality",
-          icon: "⭐",
-          title: "Compromiso con la Calidad",
-          content: ["Utilizamos materiales de primera calidad y seguimos rigurosos controles de calidad en cada etapa de producción. Nuestros productos cumplen con todas las normativas y estándares internacionales."]
-        },
-        {
-          id: "sustainability",
-          icon: "🌱",
-          title: "Responsabilidad Social y Ambiental",
-          content: ["Nos comprometemos a reducir nuestro impacto ambiental utilizando materiales reciclados y procesos sostenibles. Participamos en iniciativas comunitarias y apoyamos causas sociales que benefician a nuestra localidad."]
-        },
-        {
-          id: "ethics",
-          icon: "🤝",
-          title: "Ética en los Negocios",
-          content: ["Mantenemos relaciones transparentes y justas con proveedores, clientes y empleados. Rechazamos cualquier práctica corrupta o desleal en nuestras operaciones."]
-        },
-        {
-          id: "innovation",
-          icon: "💡",
-          title: "Innovación y Mejora Continua",
-          content: ["Invertimos en investigación y desarrollo para ofrecer productos y servicios innovadores. Escuchamos las opiniones de nuestros clientes para mejorar constantemente."]
-        }
-      ]
-    },
-    
-    privacyPolicies: {
-      title: "Políticas de Privacidad",
-      intro: "Respetamos y protegemos tu privacidad. A continuación, te explicamos cómo recopilamos, utilizamos y protegemos tu información personal:",
-      items: [
-        {
-          id: "data",
-          icon: "📊",
-          title: "Información Recopilada",
-          content: [
-            "<strong>Datos Personales:</strong> Nombre, dirección, correo electrónico, teléfono y detalles de pago.",
-            "<strong>Datos de Navegación:</strong> Información sobre tu interacción con nuestro sitio web, como direcciones IP y cookies."
-          ]
-        },
-        {
-          id: "usage",
-          icon: "📝",
-          title: "Uso de la Información",
-          content: ["Utilizamos tus datos para procesar pedidos, brindar soporte al cliente y mejorar nuestros servicios. Nunca compartimos tu información con terceros sin tu consentimiento, excepto cuando sea necesario para cumplir con la ley."]
-        },
-        {
-          id: "security",
-          icon: "🔒",
-          title: "Seguridad de los Datos",
-          content: ["Implementamos medidas de seguridad avanzadas para proteger tu información contra accesos no autorizados o pérdidas. Todos los datos de pago se procesan a través de plataformas seguras y encriptadas."]
-        },
-        {
-          id: "rights",
-          icon: "⚖️",
-          title: "Tus Derechos",
-          content: ["Puedes solicitar acceso, rectificación o eliminación de tus datos personales en cualquier momento. Si deseas dejar de recibir comunicaciones comerciales, puedes darte de baja fácilmente a través de nuestros correos electrónicos."]
-        },
-        {
-          id: "changes",
-          icon: "🔄",
-          title: "Cambios en la Política",
-          content: ["Nos reservamos el derecho de actualizar esta política en cualquier momento. Cualquier cambio será notificado a través de nuestro sitio web y por correo electrónico a nuestros clientes registrados."]
-        }
-      ]
-    }
-  };
+const Politicas = () => {
+  const [politicas, setPoliticas] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Combinar datos proporcionados con valores predeterminados
-  const policyData = data || defaultData;
+  useEffect(() => {
+    const fetchPoliticas = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_URL}/politicas`);
+        
+        if (!response.ok) {
+          throw new Error(`Error al obtener las políticas: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setPoliticas(data);
+        setError(null);
+      } catch (error) {
+        console.error("Error al obtener las políticas:", error);
+        setError("No se pudieron cargar las políticas. Por favor, intenta más tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPoliticas();
+  }, []);
 
   const styles = {
     pageContainer: {
@@ -263,7 +165,26 @@ const Politicas = ({ data }) => {
     accordionBody: {
       padding: '25px',
       backgroundColor: colors.white,
-    }
+    },
+    loadingContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '300px',
+      width: '100%',
+      textAlign: 'center',
+    },
+    errorContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '50vh',
+      width: '100%',
+      textAlign: 'center',
+      padding: '30px',
+    },
   };
 
   // Función para aplicar resaltado al texto
@@ -286,7 +207,7 @@ const Politicas = ({ data }) => {
   // Función para manejar el desplazamiento suave al cargar la página
   useEffect(() => {
     // Comprueba si hay un hash en la URL
-    if (window.location.hash) {
+    if (window.location.hash && politicas) {
       const id = window.location.hash.substring(1); // Elimina el # del hash
       const element = document.getElementById(id);
       
@@ -297,7 +218,44 @@ const Politicas = ({ data }) => {
         }, 100);
       }
     }
-  }, []);
+  }, [politicas]); // Añadido politicas como dependencia para que se ejecute cuando los datos estén disponibles
+
+  // Renderizar indicador de carga mientras se obtienen los datos
+  if (loading) {
+    return (
+      <div style={styles.pageContainer}>
+        <Container>
+          <div style={styles.loadingContainer}>
+            <Spinner animation="border" role="status" variant="primary" style={{ marginBottom: '20px' }}>
+              <span className="visually-hidden">Cargando políticas...</span>
+            </Spinner>
+            <p style={{ fontSize: '18px', color: colors.primaryMedium }}>Cargando políticas de JADA Company...</p>
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  // Si hay un error, mostrar mensaje de error sin datos de respaldo
+  if (error || !politicas) {
+    return (
+      <div style={styles.pageContainer}>
+        <Container>
+          <div style={styles.errorContainer}>
+            <Alert variant="danger" style={{ maxWidth: '600px', width: '100%' }}>
+              <Alert.Heading>Error al cargar las políticas</Alert.Heading>
+              <p>{error || "No se pudieron obtener las políticas. Por favor, intenta más tarde."}</p>
+              <hr />
+              <div className="d-flex justify-content-between">
+                <Button variant="outline-danger" onClick={() => window.location.reload()}> Intentar nuevamente </Button>
+                <Button variant="outline-primary"onClick={() => window.history.back()} > Volver atrás</Button>
+              </div>
+            </Alert>
+          </div>
+        </Container>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.pageContainer}>
@@ -306,26 +264,26 @@ const Politicas = ({ data }) => {
         <Row style={styles.headerSection}>
           <Col xs={12} className="text-center">
             <h1 style={styles.title}>
-              {policyData.pageTitle}
+              {politicas.pageTitle}
               <div style={styles.titleLine}></div>
             </h1>
             <p style={styles.sectionIntro}>
-              {policyData.pageIntro}
+              {politicas.pageIntro}
             </p>
           </Col>
         </Row>
 
         {/* Políticas del Cliente */}
-        {policyData.clientPolicies && (
+        {politicas.clientPolicies && (
           <Row className="mb-5" id="cliente">
             <Col xs={12}>
-              <h2 style={styles.subtitle}>{policyData.clientPolicies.title}</h2>
+              <h2 style={styles.subtitle}>{politicas.clientPolicies.title}</h2>
               <p style={{...styles.paragraph, marginBottom: '30px'}}>
-                {policyData.clientPolicies.intro}
+                {politicas.clientPolicies.intro}
               </p>
 
               <Accordion defaultActiveKey="0" style={styles.accordionCustom}>
-                {policyData.clientPolicies.items.map((policy, index) => (
+                {politicas.clientPolicies.items.map((policy, index) => (
                   <Accordion.Item eventKey={String(index)} key={policy.id}>
                     <Accordion.Header style={styles.accordionHeader}>
                       <span>{policy.icon} {policy.title}</span>
@@ -347,16 +305,16 @@ const Politicas = ({ data }) => {
         <hr style={styles.sectionDivider} />
 
         {/* Políticas de la Empresa */}
-        {policyData.companyPolicies && (
-          <Row className="mb-5">
+        {politicas.companyPolicies && (
+          <Row className="mb-5" id="empresa">
             <Col xs={12}>
-              <h2 style={styles.subtitle}>{policyData.companyPolicies.title}</h2>
+              <h2 style={styles.subtitle}>{politicas.companyPolicies.title}</h2>
               <p style={{...styles.paragraph, marginBottom: '30px'}}>
-                {policyData.companyPolicies.intro}
+                {politicas.companyPolicies.intro}
               </p>
 
               <Row>
-                {policyData.companyPolicies.items.map((policy) => (
+                {politicas.companyPolicies.items.map((policy) => (
                   <Col md={6} className="mb-4" key={policy.id}>
                     <Card style={styles.policyCard}>
                       <Card.Header style={styles.cardHeader}>
@@ -381,16 +339,16 @@ const Politicas = ({ data }) => {
         <hr style={styles.sectionDivider} />
 
         {/* Políticas de Privacidad */}
-        {policyData.privacyPolicies && (
+        {politicas.privacyPolicies && (
           <Row id="privacidad">
             <Col xs={12}>
-              <h2 style={styles.subtitle}>{policyData.privacyPolicies.title}</h2>
+              <h2 style={styles.subtitle}>{politicas.privacyPolicies.title}</h2>
               <p style={{...styles.paragraph, marginBottom: '30px'}}>
-                {policyData.privacyPolicies.intro}
+                {politicas.privacyPolicies.intro}
               </p>
 
               <Row>
-                {policyData.privacyPolicies.items.map((policy) => (
+                {politicas.privacyPolicies.items.map((policy) => (
                   <Col lg={policy.id === 'data' ? 4 : (policy.id === 'rights' || policy.id === 'changes' ? 6 : 4)} md={6} className="mb-4" key={policy.id}>
                     <Card style={styles.policyCard}>
                       <Card.Header style={styles.cardHeader}>

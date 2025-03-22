@@ -11,10 +11,10 @@ import DashboardPrivado from "../pages/private/Dashboard.js";
 import Dispositivos from "../pages/private/Dispositivos.js";
 import Perfil from "../pages/private/Perfil.js";
 
-// Páginas públicas (pero para usuarios autenticados)
-// Estas son las mismas páginas que se usan en el área pública, pero ahora accesibles para usuarios autenticados
+// Páginas públicas (accesibles para usuarios autenticados)
 import Inicio from "../pages/public/Inicio.js";
 import Productos from "../pages/public/Productos.js";
+import ProductoDetalle from "../pages/public/ProductoDetalle.js"; 
 import Servicios from "../pages/public/Servicios.js";
 import Nosotros from "../pages/public/Nosotros.js";
 import Contacto from "../pages/public/Contacto.js";
@@ -49,6 +49,7 @@ const privateRoutes = (
     <Route path="/privado/sitio" element={<PrivatePublicLayout />}>
       <Route index element={<Inicio />} />
       <Route path="productos" element={<Productos />} />
+      <Route path="productos/:id" element={<ProductoDetalle />} />
       <Route path="servicios" element={<Servicios />} />
       <Route path="nosotros" element={<Nosotros />} />
       <Route path="contacto" element={<Contacto />} />

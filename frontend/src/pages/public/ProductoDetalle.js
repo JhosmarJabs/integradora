@@ -1,28 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Badge, ListGroup, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Badge, ListGroup, Tabs, Tab, Alert, Spinner } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios'; 
 import { colors, textStyles, buttons } from '../../styles/styles';
-import productos from '../../services/base';
+import { API_URL } from '../../config';
 
 const ProductoDetalle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [producto, setProducto] = useState(null);
+  const [productosRelacionados, setProductosRelacionados] = useState([]);
   const [cantidad, setCantidad] = useState(1);
   const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // Simulamos la carga del producto desde la base
-    setCargando(true);
-    
-    // Busca el producto por id
-    const productoEncontrado = productos.find(p => p._id === id);
-    
-    if (productoEncontrado) {
-      setProducto(productoEncontrado);
+  // Función para obtener un producto desde la API por su ID
+  const obtenerProducto = async (productId) => {
+    try {
+      setCargando(true);
+      setError(null);
+      
+      // Realizar la petición a la API
+      const response = await axios.get(`${API_URL}/productos/${productId}`);
+      
+      // Si la petición es exitosa, guardamos el producto en el estado
+      setProducto(response.data);
+      
+      // Después de obtener el producto, buscamos productos relacionados
+      obtenerProductosRelacionados(response.data.category);
+    } catch (err) {
+      console.error("Error al obtener el producto:", err);
+      setError("No se pudo cargar el producto. Por favor, intenta más tarde.");
+    } finally {
+      setCargando(false);
     }
-    
-    setCargando(false);
+  };
+
+  // Función para obtener productos relacionados por categoría
+  const obtenerProductosRelacionados = async (categoria) => {
+    try {
+      // Realizar la petición a la API para productos de la misma categoría
+      const response = await axios.get(`${API_URL}/productos`, {
+        params: { categoria: categoria, limite: 4, excluir: id }
+      });
+      
+      // Guardar productos relacionados
+      setProductosRelacionados(response.data);
+    } catch (err) {
+      console.error("Error al obtener productos relacionados:", err);
+      // Simplemente establecemos un array vacío en caso de error
+      setProductosRelacionados([]);
+    }
+  };
+
+  // Cargar el producto cuando se monta el componente o cambia el ID
+  useEffect(() => {
+    obtenerProducto(id);
   }, [id]);
 
   const calcularPrecioConDescuento = () => {
@@ -43,10 +76,63 @@ const ProductoDetalle = () => {
     }
   };
 
+  // Añadir al carrito (simulado)
+  const handleAddToCart = () => {
+    // Aquí implementaríamos la lógica para añadir al carrito
+    // Podría ser una petición a la API o almacenar en localStorage
+    alert(`Producto ${producto.title} añadido al carrito (${cantidad} unidades)`);
+  };
+
+  // Compra inmediata (simulado)
+  const handleBuyNow = () => {
+    // Aquí implementaríamos la lógica para compra directa
+    // Podría redirigir a un checkout o similar
+    
+    navigate('/checkout', { 
+      state: { 
+        productos: [{ ...producto, cantidad }], 
+        total: calcularPrecioConDescuento() * cantidad 
+      } 
+    });
+  };
+
   if (cargando) {
     return (
       <Container className="py-5 text-center">
-        <h2>Cargando producto...</h2>
+        <Spinner 
+          animation="border" 
+          role="status" 
+          style={{ color: colors.primaryDark, width: "4rem", height: "4rem", margin: "2rem auto" }}
+        >
+          <span className="visually-hidden">Cargando...</span>
+        </Spinner>
+        <h2 style={{ color: colors.primaryDark }}>Cargando producto...</h2>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="py-5">
+        <Alert variant="danger">
+          <Alert.Heading>Error al cargar el producto</Alert.Heading>
+          <p>{error}</p>
+          <hr />
+          <div className="d-flex justify-content-between">
+            <Button 
+              variant="outline-danger" 
+              onClick={() => obtenerProducto(id)}
+            >
+              Reintentar
+            </Button>
+            <Button 
+              variant="outline-primary" 
+              onClick={handleVolverProductos}
+            >
+              Volver a Productos
+            </Button>
+          </div>
+        </Alert>
       </Container>
     );
   }
@@ -54,7 +140,10 @@ const ProductoDetalle = () => {
   if (!producto) {
     return (
       <Container className="py-5 text-center">
-        <h2>Producto no encontrado</h2>
+        <h2 style={{ color: colors.primaryDark }}>Producto no encontrado</h2>
+        <p style={{ color: colors.primaryMedium }}>
+          Lo sentimos, el producto que buscas no existe o ha sido eliminado.
+        </p>
         <Button 
           style={{ ...buttons.primary }} 
           onClick={handleVolverProductos} 
@@ -188,6 +277,7 @@ const ProductoDetalle = () => {
                 <Button 
                   style={buttons.primary} 
                   className="w-100"
+                  onClick={handleAddToCart}
                 >
                   Agregar al Carrito
                 </Button>
@@ -199,6 +289,7 @@ const ProductoDetalle = () => {
                     backgroundColor: colors.accent
                   }} 
                   className="w-100"
+                  onClick={handleBuyNow}
                 >
                   Comprar Ahora
                 </Button>
@@ -313,11 +404,9 @@ const ProductoDetalle = () => {
       <Row className="mt-5">
         <Col>
           <h3 style={textStyles.subtitle} className="mb-4">Productos Relacionados</h3>
-          <Row>
-            {productos
-              .filter(p => p.category === producto.category && p._id !== producto._id)
-              .slice(0, 4)
-              .map(item => (
+          {productosRelacionados.length > 0 ? (
+            <Row>
+              {productosRelacionados.map(item => (
                 <Col md={3} sm={6} key={item._id} className="mb-4">
                   <Card className="h-100 shadow-sm">
                     <Card.Img 
@@ -351,9 +440,11 @@ const ProductoDetalle = () => {
                     </Card.Body>
                   </Card>
                 </Col>
-              ))
-            }
-          </Row>
+              ))}
+            </Row>
+          ) : (
+            <p style={{ color: colors.primaryMedium }}>No hay productos relacionados disponibles.</p>
+          )}
         </Col>
       </Row>
     </Container>

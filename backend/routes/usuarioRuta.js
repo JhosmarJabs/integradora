@@ -5,7 +5,7 @@ const Usuario = require('../models/usuarios');
 
 
 // Ruta para registrar un usuario
-router.post('/', async (req, res) => {
+router.post('/registro', async (req, res) => {
     const { name, surname, phone, email, password, role, status } = req.body;
 
     try {
