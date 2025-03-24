@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios"; // Importamos axios para realizar peticiones HTTP
-import { colors, textStyles} from "../../styles/styles";
+import { colors, textStyles } from "../../styles/styles";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.min.css";
 import { API_URL } from "../../config";
@@ -12,7 +12,7 @@ const Productos = () => {
   const [error, setError] = useState(null);
   const [productos, setProductos] = useState([]);
   const [filtros, setFiltros] = useState({
-    ordenar: "",  
+    ordenar: "",
     tamaño: "",
     filtracionLuz: "",
     color: "",
@@ -20,7 +20,7 @@ const Productos = () => {
     precio: "",
     busqueda: "",
   });
-  
+
   const [filtrosExpandidos, setFiltrosExpandidos] = useState(false);
   const [productosFiltrados, setProductosFiltrados] = useState([]);
   const [filtrosActivos, setFiltrosActivos] = useState(0);
@@ -31,21 +31,26 @@ const Productos = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Realizar la petición a la API
       const response = await axios.get(`${API_URL}/productos`);
-      
+
       // Extraer el array de productos de la respuesta
-      const productosArray = response.data && response.data.data && Array.isArray(response.data.data) 
-        ? response.data.data 
-        : (Array.isArray(response.data) ? response.data : []);
-      
+      const productosArray =
+        response.data && response.data.data && Array.isArray(response.data.data)
+          ? response.data.data
+          : Array.isArray(response.data)
+          ? response.data
+          : [];
+
       // Si la petición es exitosa, guardamos los productos en el estado
       setProductos(productosArray);
       setProductosFiltrados(productosArray);
     } catch (err) {
       console.error("Error al obtener productos:", err);
-      setError("No se pudieron cargar los productos. Por favor, intenta más tarde.");
+      setError(
+        "No se pudieron cargar los productos. Por favor, intenta más tarde."
+      );
     } finally {
       setLoading(false);
     }
@@ -74,7 +79,9 @@ const Productos = () => {
       precio: "",
       busqueda: "",
     });
-    document.querySelectorAll(".form-select").forEach((select) => (select.value = ""));
+    document
+      .querySelectorAll(".form-select")
+      .forEach((select) => (select.value = ""));
     document.querySelector("input[name='busqueda']").value = "";
   };
 
@@ -94,18 +101,27 @@ const Productos = () => {
 
       // Filtro de búsqueda
       if (filtros.busqueda) {
-        resultado = resultado.filter(producto => 
-          producto.title.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
-          producto.description.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
-          producto.category.toLowerCase().includes(filtros.busqueda.toLowerCase())
+        resultado = resultado.filter(
+          (producto) =>
+            producto.title
+              .toLowerCase()
+              .includes(filtros.busqueda.toLowerCase()) ||
+            producto.description
+              .toLowerCase()
+              .includes(filtros.busqueda.toLowerCase()) ||
+            producto.category
+              .toLowerCase()
+              .includes(filtros.busqueda.toLowerCase())
         );
         contadorFiltros++;
       }
 
       // Filtros de categoría
       if (filtros.tipo) {
-        resultado = resultado.filter(producto => 
-          producto.category && producto.category.toLowerCase() === filtros.tipo.toLowerCase()
+        resultado = resultado.filter(
+          (producto) =>
+            producto.category &&
+            producto.category.toLowerCase() === filtros.tipo.toLowerCase()
         );
         contadorFiltros++;
       }
@@ -114,13 +130,15 @@ const Productos = () => {
       if (filtros.precio) {
         switch (filtros.precio) {
           case "low":
-            resultado = resultado.filter(producto => producto.price < 500);
+            resultado = resultado.filter((producto) => producto.price < 500);
             break;
           case "medium":
-            resultado = resultado.filter(producto => producto.price >= 500 && producto.price <= 1000);
+            resultado = resultado.filter(
+              (producto) => producto.price >= 500 && producto.price <= 1000
+            );
             break;
           case "high":
-            resultado = resultado.filter(producto => producto.price > 1000);
+            resultado = resultado.filter((producto) => producto.price > 1000);
             break;
           default:
             break;
@@ -321,8 +339,8 @@ const Productos = () => {
     },
     productGrid: {
       display: "grid",
-      gridTemplateColumns: vistaGrilla 
-        ? "repeat(auto-fill, minmax(280px, 1fr))" 
+      gridTemplateColumns: vistaGrilla
+        ? "repeat(auto-fill, minmax(280px, 1fr))"
         : "1fr",
       gap: "20px",
     },
@@ -406,31 +424,34 @@ const Productos = () => {
               value={filtros.busqueda}
             />
           </div>
-          
+
           <div style={styles.filterActions}>
-            <button 
-              style={styles.filterButton} 
-              onClick={toggleFiltros}
-            >
+            <button style={styles.filterButton} onClick={toggleFiltros}>
               <i className="bi bi-funnel"></i>
               Filtros
-              {filtrosActivos > 0 && <span style={styles.filterCount}>{filtrosActivos}</span>}
+              {filtrosActivos > 0 && (
+                <span style={styles.filterCount}>{filtrosActivos}</span>
+              )}
             </button>
-            
+
             <div style={styles.viewToggle}>
-              <div 
+              <div
                 style={{
-                  ...styles.viewButton, 
-                  ...(vistaGrilla ? styles.activeViewButton : styles.inactiveViewButton)
+                  ...styles.viewButton,
+                  ...(vistaGrilla
+                    ? styles.activeViewButton
+                    : styles.inactiveViewButton),
                 }}
                 onClick={() => vistaGrilla || toggleVistaGrilla()}
               >
                 <i className="bi bi-grid-3x3-gap-fill"></i>
               </div>
-              <div 
+              <div
                 style={{
-                  ...styles.viewButton, 
-                  ...(!vistaGrilla ? styles.activeViewButton : styles.inactiveViewButton)
+                  ...styles.viewButton,
+                  ...(!vistaGrilla
+                    ? styles.activeViewButton
+                    : styles.inactiveViewButton),
                 }}
                 onClick={() => !vistaGrilla || toggleVistaGrilla()}
               >
@@ -439,15 +460,15 @@ const Productos = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Panel de filtros expandible */}
         <div style={styles.filterPanel}>
           <div style={styles.filterGrid}>
             <div style={styles.filterGroup}>
               <label style={styles.filterLabel}>Ordenar por</label>
-              <select 
-                name="ordenar" 
-                className="form-select" 
+              <select
+                name="ordenar"
+                className="form-select"
                 style={styles.filterSelect}
                 onChange={handleChange}
                 value={filtros.ordenar}
@@ -459,12 +480,12 @@ const Productos = () => {
                 <option value="newest">Más recientes</option>
               </select>
             </div>
-            
+
             <div style={styles.filterGroup}>
               <label style={styles.filterLabel}>Tamaño</label>
-              <select 
-                name="tamaño" 
-                className="form-select" 
+              <select
+                name="tamaño"
+                className="form-select"
                 style={styles.filterSelect}
                 onChange={handleChange}
                 value={filtros.tamaño}
@@ -475,12 +496,12 @@ const Productos = () => {
                 <option value="grande">Grande</option>
               </select>
             </div>
-            
+
             <div style={styles.filterGroup}>
               <label style={styles.filterLabel}>Filtración de luz</label>
-              <select 
-                name="filtracionLuz" 
-                className="form-select" 
+              <select
+                name="filtracionLuz"
+                className="form-select"
                 style={styles.filterSelect}
                 onChange={handleChange}
                 value={filtros.filtracionLuz}
@@ -491,12 +512,12 @@ const Productos = () => {
                 <option value="alta">Alta (Blackout)</option>
               </select>
             </div>
-            
+
             <div style={styles.filterGroup}>
               <label style={styles.filterLabel}>Color</label>
-              <select 
-                name="color" 
-                className="form-select" 
+              <select
+                name="color"
+                className="form-select"
                 style={styles.filterSelect}
                 onChange={handleChange}
                 value={filtros.color}
@@ -509,12 +530,12 @@ const Productos = () => {
                 <option value="madera">Acabado madera</option>
               </select>
             </div>
-            
+
             <div style={styles.filterGroup}>
               <label style={styles.filterLabel}>Tipo</label>
-              <select 
-                name="tipo" 
-                className="form-select" 
+              <select
+                name="tipo"
+                className="form-select"
                 style={styles.filterSelect}
                 onChange={handleChange}
                 value={filtros.tipo}
@@ -526,12 +547,12 @@ const Productos = () => {
                 <option value="Climatización">Climatización</option>
               </select>
             </div>
-            
+
             <div style={styles.filterGroup}>
               <label style={styles.filterLabel}>Precio</label>
-              <select 
-                name="precio" 
-                className="form-select" 
+              <select
+                name="precio"
+                className="form-select"
                 style={styles.filterSelect}
                 onChange={handleChange}
                 value={filtros.precio}
@@ -543,33 +564,35 @@ const Productos = () => {
               </select>
             </div>
           </div>
-          
+
           {/* Botones de acción */}
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "15px", marginTop: "20px" }}>
-            <button 
-              style={styles.clearButton}
-              onClick={limpiarFiltros}
-            >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "15px",
+              marginTop: "20px",
+            }}
+          >
+            <button style={styles.clearButton} onClick={limpiarFiltros}>
               <i className="bi bi-trash3"></i>
               Limpiar filtros
             </button>
-            <button 
-              style={styles.applyButton}
-              onClick={toggleFiltros}
-            >
+            <button style={styles.applyButton} onClick={toggleFiltros}>
               <i className="bi bi-check2"></i>
               Aplicar filtros
             </button>
           </div>
         </div>
-        
+
         {/* Información de resultados (solo si no está cargando) */}
         {!loading && !error && (
           <div style={styles.resultsInfo}>
-            Mostrando {productosFiltrados.length} productos {filtrosActivos > 0 ? "filtrados" : ""}
+            Mostrando {productosFiltrados.length} productos{" "}
+            {filtrosActivos > 0 ? "filtrados" : ""}
           </div>
         )}
-        
+
         {/* Estado de carga */}
         {loading && (
           <div style={styles.loadingContainer}>
@@ -588,14 +611,17 @@ const Productos = () => {
             </p>
           </div>
         )}
-        
+
         {/* Estado de error */}
         {error && !loading && (
           <div style={styles.errorContainer}>
-            <i className="bi bi-exclamation-triangle" style={{ fontSize: "48px", marginBottom: "20px" }}></i>
+            <i
+              className="bi bi-exclamation-triangle"
+              style={{ fontSize: "48px", marginBottom: "20px" }}
+            ></i>
             <h3>Error al cargar los productos</h3>
             <p>{error}</p>
-            <button 
+            <button
               style={{
                 backgroundColor: colors.primaryDark,
                 color: colors.white,
@@ -603,7 +629,7 @@ const Productos = () => {
                 borderRadius: "8px",
                 border: "none",
                 marginTop: "15px",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
               onClick={obtenerProductos}
             >
@@ -612,112 +638,161 @@ const Productos = () => {
             </button>
           </div>
         )}
-        
+
         {/* Resultados (solo mostrar si no hay error y no está cargando) */}
-        {!loading && !error && (
-          productosFiltrados.length > 0 ? (
+        {!loading &&
+          !error &&
+          (productosFiltrados.length > 0 ? (
             <div className="productResults">
               <div style={styles.productGrid}>
-                {productosFiltrados.map(producto => (
-                  <div 
-                    key={producto._id} 
+                {productosFiltrados.map((producto) => (
+                  <div
+                    key={producto._id}
                     style={styles.productCard}
                     onClick={() => verDetalleProducto(producto._id)}
                   >
-                    <div style={{
-                      padding: vistaGrilla ? "0" : "15px",
-                      display: "flex",
-                      flexDirection: vistaGrilla ? "column" : "row",
-                    }}>
-                      <div style={{
-                        width: vistaGrilla ? "100%" : "180px",
-                        height: vistaGrilla ? "200px" : "150px",
-                        overflow: "hidden",
-                        borderRadius: vistaGrilla ? "12px 12px 0 0" : "8px",
-                      }}>
-                        <img 
-                          src={producto.image} 
-                          alt={producto.title} 
+                    <div
+                      style={{
+                        padding: vistaGrilla ? "0" : "15px",
+                        display: "flex",
+                        flexDirection: vistaGrilla ? "column" : "row",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: vistaGrilla ? "100%" : "180px",
+                          height: vistaGrilla ? "200px" : "150px",
+                          overflow: "hidden",
+                          borderRadius: vistaGrilla ? "12px 12px 0 0" : "8px",
+                        }}
+                      >
+                        <img
+                          src={`${API_URL}${producto.image}`}
+                          alt={producto.title}
                           style={{
-                            width: "100%", 
-                            height: "100%", 
-                            objectFit: "cover"
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
                           }}
                         />
                       </div>
-                      <div style={{
-                        padding: vistaGrilla ? "15px" : "0 0 0 20px",
-                        flex: 1,
-                      }}>
-                        <h3 style={{
-                          fontSize: vistaGrilla ? "18px" : "20px",
-                          fontWeight: "600",
-                          marginBottom: "8px",
-                          color: colors.primaryDark,
-                        }}>{producto.title}</h3>
-                        
-                        <p style={{
-                          fontSize: "14px",
-                          marginBottom: "10px",
-                          color: colors.primaryLight,
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                        }}>{producto.description}</p>
-                        
-                        <div style={{
-                          display: "flex",
-                          alignItems: "center",
-                          fontSize: "14px",
-                          marginBottom: "8px",
-                        }}>
-                          <span style={{
-                            display: "inline-block",
-                            padding: "4px 8px",
-                            backgroundColor: "rgba(65, 90, 119, 0.1)",
-                            color: colors.primaryMedium,
-                            borderRadius: "4px",
-                            marginRight: "8px",
-                          }}>{producto.category}</span>
-                          
-                          <div style={{
+                      <div
+                        style={{
+                          padding: vistaGrilla ? "15px" : "0 0 0 20px",
+                          flex: 1,
+                        }}
+                      >
+                        <h3
+                          style={{
+                            fontSize: vistaGrilla ? "18px" : "20px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                            color: colors.primaryDark,
+                          }}
+                        >
+                          {producto.title}
+                        </h3>
+
+                        <p
+                          style={{
+                            fontSize: "14px",
+                            marginBottom: "10px",
+                            color: colors.primaryLight,
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {producto.description}
+                        </p>
+
+                        <div
+                          style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: "3px",
-                            color: "#ffc107",
-                          }}>
+                            fontSize: "14px",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: "inline-block",
+                              padding: "4px 8px",
+                              backgroundColor: "rgba(65, 90, 119, 0.1)",
+                              color: colors.primaryMedium,
+                              borderRadius: "4px",
+                              marginRight: "8px",
+                            }}
+                          >
+                            {producto.category}
+                          </span>
+
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "3px",
+                              color: "#ffc107",
+                            }}
+                          >
                             <i className="bi bi-star-fill"></i>
-                            <span style={{ color: colors.primaryDark, fontWeight: "600" }}>{producto.rating}</span>
-                            <span style={{ color: colors.primaryLight, fontSize: "12px" }}>({producto.reviews})</span>
-                          </div>
-                        </div>
-                        
-                        <div style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginTop: "8px",
-                        }}>
-                          <div>
-                            {producto.discount > 0 && (
-                              <span style={{
-                                textDecoration: "line-through",
-                                fontSize: "14px",
+                            <span
+                              style={{
+                                color: colors.primaryDark,
+                                fontWeight: "600",
+                              }}
+                            >
+                              {producto.rating}
+                            </span>
+                            <span
+                              style={{
                                 color: colors.primaryLight,
-                                marginRight: "8px",
-                              }}>${producto.price.toFixed(2)}</span>
-                            )}
-                            <span style={{
-                              fontSize: vistaGrilla ? "18px" : "22px",
-                              fontWeight: "bold",
-                              color: colors.primaryDark,
-                            }}>
-                              ${(producto.price * (1 - producto.discount/100)).toFixed(2)}
+                                fontSize: "12px",
+                              }}
+                            >
+                              ({producto.reviews})
                             </span>
                           </div>
-                          
-                          <button 
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginTop: "8px",
+                          }}
+                        >
+                          <div>
+                            {producto.discount > 0 && (
+                              <span
+                                style={{
+                                  textDecoration: "line-through",
+                                  fontSize: "14px",
+                                  color: colors.primaryLight,
+                                  marginRight: "8px",
+                                }}
+                              >
+                                ${producto.price.toFixed(2)}
+                              </span>
+                            )}
+                            <span
+                              style={{
+                                fontSize: vistaGrilla ? "18px" : "22px",
+                                fontWeight: "bold",
+                                color: colors.primaryDark,
+                              }}
+                            >
+                              $
+                              {(
+                                producto.price *
+                                (1 - producto.discount / 100)
+                              ).toFixed(2)}
+                            </span>
+                          </div>
+
+                          <button
                             style={{
                               backgroundColor: colors.primaryMedium,
                               color: colors.white,
@@ -750,9 +825,10 @@ const Productos = () => {
               </div>
               <h3 style={styles.noResultsText}>No se encontraron productos</h3>
               <p style={styles.noResultsSubtext}>
-                Prueba con diferentes criterios de búsqueda o elimina algunos filtros.
+                Prueba con diferentes criterios de búsqueda o elimina algunos
+                filtros.
               </p>
-              <button 
+              <button
                 style={{
                   ...styles.clearButton,
                   margin: "20px auto 0",
@@ -764,8 +840,7 @@ const Productos = () => {
                 Restablecer filtros
               </button>
             </div>
-          )
-        )}
+          ))}
       </div>
     </div>
   );

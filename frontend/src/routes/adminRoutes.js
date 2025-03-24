@@ -12,7 +12,7 @@ import UsuariosAltas from "../pages/admin/usuarios/UsuariosAltas.js";
 import UsuariosBajas from "../pages/admin/usuarios/UsuariosBajas.js";
 import UsuariosCambios from "../pages/admin/usuarios/UsuariosCambios.js";
 
-import IoTGeneral from "../pages/admin/iot/IoTGeneral.js";
+import ProductosGeneral from "../pages/admin/iot/ProductosGeneral.js";
 import IoTVinculacion from "../pages/admin/iot/IoTVinculacion.js";
 import IoTAltas from "../pages/admin/iot/IoTAltas.js";
 import IoTBajas from "../pages/admin/iot/IoTBajas.js";
@@ -44,7 +44,7 @@ const adminRoutes = (
     <Route path="usuarios/cambios" element={<UsuariosCambios />} />
     
     {/* IoT */}
-    <Route path="iot" element={<IoTGeneral />} />
+    <Route path="productos" element={<ProductosGeneral />} />
     <Route path="iot/vinculacion" element={<IoTVinculacion />} />
     <Route path="iot/altas" element={<IoTAltas />} />
     <Route path="iot/bajas" element={<IoTBajas />} />

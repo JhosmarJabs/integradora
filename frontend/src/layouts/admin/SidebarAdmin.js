@@ -289,11 +289,11 @@ const SidebarAdmin = ({ collapsed, onToggle }) => {
                 </Link>
               </li>
               <li style={styles.submenuItem}>
-                <Link to="/admin/usuarios/altas" style={{
+                <Link to="/admin/usuarios/cambios" style={{
                   ...styles.submenuLink,
-                  ...(isActive('/admin/usuarios/altas') ? styles.menuLinkActive : {})
+                  ...(isActive('/admin/usuarios/cambios') ? styles.menuLinkActive : {})
                 }}>
-                  <span style={styles.submenuText}>Altas</span>
+                  <span style={styles.submenuText}>Cambios</span>
                 </Link>
               </li>
               <li style={styles.submenuItem}>
@@ -302,14 +302,6 @@ const SidebarAdmin = ({ collapsed, onToggle }) => {
                   ...(isActive('/admin/usuarios/bajas') ? styles.menuLinkActive : {})
                 }}>
                   <span style={styles.submenuText}>Bajas</span>
-                </Link>
-              </li>
-              <li style={styles.submenuItem}>
-                <Link to="/admin/usuarios/cambios" style={{
-                  ...styles.submenuLink,
-                  ...(isActive('/admin/usuarios/cambios') ? styles.menuLinkActive : {})
-                }}>
-                  <span style={styles.submenuText}>Cambios</span>
                 </Link>
               </li>
             </ul>
@@ -329,7 +321,7 @@ const SidebarAdmin = ({ collapsed, onToggle }) => {
             <span style={styles.menuIcon}>
               <FaNetworkWired size={22} />
             </span>
-            <span style={styles.menuText}>IoT</span>
+            <span style={styles.menuText}>Pooductos</span>
             <span style={styles.menuToggle}>
               {expandedMenus.iot ? <FaChevronDown size={12} /> : <FaChevronRight size={12} />}
             </span>
@@ -340,11 +332,11 @@ const SidebarAdmin = ({ collapsed, onToggle }) => {
           }}>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li style={styles.submenuItem}>
-                <Link to="/admin/iot" style={{
+                <Link to="/admin/productos" style={{
                   ...styles.submenuLink,
                   ...(isActive('/admin/iot') ? styles.menuLinkActive : {})
                 }}>
-                  <span style={styles.submenuText}>IoT</span>
+                  <span style={styles.submenuText}>Vista General</span>
                 </Link>
               </li>
               <li style={styles.submenuItem}>
@@ -360,15 +352,7 @@ const SidebarAdmin = ({ collapsed, onToggle }) => {
                   ...styles.submenuLink,
                   ...(isActive('/admin/iot/altas') ? styles.menuLinkActive : {})
                 }}>
-                  <span style={styles.submenuText}>Altas</span>
-                </Link>
-              </li>
-              <li style={styles.submenuItem}>
-                <Link to="/admin/iot/bajas" style={{
-                  ...styles.submenuLink,
-                  ...(isActive('/admin/iot/bajas') ? styles.menuLinkActive : {})
-                }}>
-                  <span style={styles.submenuText}>Bajas</span>
+                  <span style={styles.submenuText}>Modificaciónes</span>
                 </Link>
               </li>
               <li style={styles.submenuItem}>
@@ -407,19 +391,19 @@ const SidebarAdmin = ({ collapsed, onToggle }) => {
           }}>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li style={styles.submenuItem}>
-                <Link to="/admin/informacion/modificacion" style={{
-                  ...styles.submenuLink,
-                  ...(isActive('/admin/informacion/modificacion') ? styles.menuLinkActive : {})
-                }}>
-                  <span style={styles.submenuText}>Modificación</span>
-                </Link>
-              </li>
-              <li style={styles.submenuItem}>
                 <Link to="/admin/informacion/vista" style={{
                   ...styles.submenuLink,
                   ...(isActive('/admin/informacion/vista') ? styles.menuLinkActive : {})
                 }}>
                   <span style={styles.submenuText}>Vista General</span>
+                </Link>
+              </li>
+              <li style={styles.submenuItem}>
+                <Link to="/admin/informacion/modificacion" style={{
+                  ...styles.submenuLink,
+                  ...(isActive('/admin/informacion/modificacion') ? styles.menuLinkActive : {})
+                }}>
+                  <span style={styles.submenuText}>Modificación</span>
                 </Link>
               </li>
             </ul>

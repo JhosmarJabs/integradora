@@ -14,6 +14,7 @@ import Nosotros from "../pages/public/Nosotros.js";
 import Contacto from "../pages/public/Contacto.js";
 import Login from "../pages/public/Login.js";
 import Politicas from "../pages/public/Politicas.js";
+import Testimonios from "../pages/public/Testimonios.js";
 
 // Componente para el área pública
 export const PublicRoute = ({ children }) => {
@@ -29,6 +30,7 @@ const publicRoutes = [
   <Route key="nosotros" path="/nosotros" element={ <PublicRoute> <Nosotros /> </PublicRoute>}/>,
   <Route key="contacto" path="/contacto" element={ <PublicRoute> <Contacto /> </PublicRoute>}/>,
   <Route key="politicas" path="/politicas" element={ <PublicRoute> <Politicas /> </PublicRoute>}/>,
+  <Route key="testimonios" path="/testimonios" element={ <PublicRoute> <Testimonios /> </PublicRoute>}/>,
   <Route key="login" path="/login" element={ <PublicRoute> <Login /> </PublicRoute>}/>,
   <Route key="default" path="*" element={ <PublicRoute> <Inicio /> </PublicRoute>}/>,
 ];

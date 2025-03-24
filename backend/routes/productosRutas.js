@@ -8,6 +8,7 @@ const path = require('path');
 // Configuración de multer para subida de imágenes
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
+        // Corregido la ruta para eliminar los backticks incorrectos
         cb(null, 'uploads/productos/');
     },
     filename: function(req, file, cb) {
@@ -134,6 +135,7 @@ router.post('/', verificarToken, esAdmin, upload.single('image'), async (req, re
         if (productoData.rating) productoData.rating = Number(productoData.rating);
         if (productoData.reviews) productoData.reviews = Number(productoData.reviews);
         if (productoData.discount) productoData.discount = Number(productoData.discount);
+        if (productoData.stock) productoData.stock = Number(productoData.stock);
         
         // Convertir features de string a array si viene como string
         if (productoData.features && typeof productoData.features === 'string') {
@@ -148,6 +150,7 @@ router.post('/', verificarToken, esAdmin, upload.single('image'), async (req, re
             producto: nuevoProducto
         });
     } catch (error) {
+        console.error('Error al crear producto:', error);
         res.status(400).json({ mensaje: 'Error al crear producto', error: error.message });
     }
 });
@@ -160,6 +163,9 @@ router.put('/:id', verificarToken, esAdmin, upload.single('image'), async (req, 
         // Si hay una imagen subida, actualizar la ruta
         if (req.file) {
             productoData.image = `/uploads/productos/${req.file.filename}`;
+        } else if (req.body.imageUrl) {
+            // Si no hay una nueva imagen pero se envía una URL existente, mantenerla
+            productoData.image = req.body.imageUrl;
         }
         
         // Convertir campos numéricos
@@ -167,10 +173,16 @@ router.put('/:id', verificarToken, esAdmin, upload.single('image'), async (req, 
         if (productoData.rating) productoData.rating = Number(productoData.rating);
         if (productoData.reviews) productoData.reviews = Number(productoData.reviews);
         if (productoData.discount) productoData.discount = Number(productoData.discount);
+        if (productoData.stock) productoData.stock = Number(productoData.stock);
         
         // Convertir features de string a array si viene como string
         if (productoData.features && typeof productoData.features === 'string') {
             productoData.features = productoData.features.split(',').map(item => item.trim());
+        }
+        
+        // Eliminar imageUrl si existe para no guardarla en la base de datos
+        if (productoData.imageUrl) {
+            delete productoData.imageUrl;
         }
         
         const productoActualizado = await Producto.findByIdAndUpdate(
@@ -188,7 +200,8 @@ router.put('/:id', verificarToken, esAdmin, upload.single('image'), async (req, 
             producto: productoActualizado
         });
     } catch (error) {
-        res.status(400).json({ mensaje: 'Error al actualizar producto', error: error.message });
+        console.error('Error al actualizar producto:', error);
+        res.status(500).json({ mensaje: 'Error al actualizar producto', error: error.message });
     }
 });
 

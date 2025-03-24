@@ -34,6 +34,8 @@ const contactoRuta = require('./routes/contactoRuta');
 const adminRuta = require('./routes/adminRuta');
 const pedidosRuta = require('./routes/pedidosRuta');
 const carritoRuta = require('./routes/carritoRuta');
+const politicasRuta = require('./routes/politicasRuta');
+const testimoniosRutas = require('./routes/testimoniosRutas');
 
 // Middleware para manejo de errores global
 app.use((err, req, res, next) => {
@@ -43,8 +45,6 @@ app.use((err, req, res, next) => {
         error: process.env.NODE_ENV === 'development' ? err.message : 'Ocurrió un error en el servidor'
     });
 });
-
-
 
 // Usar rutas
 app.use('/verify-session', verificarSesionRuta);
@@ -56,6 +56,8 @@ app.use('/contacto', contactoRuta);
 app.use('/admin', adminRuta);
 app.use('/pedidos', pedidosRuta);
 app.use('/carrito', carritoRuta);
+app.use('/politicas', politicasRuta);
+app.use('/testimonios', testimoniosRutas);
 
 // Ruta raíz
 app.get('/', (req, res) => {

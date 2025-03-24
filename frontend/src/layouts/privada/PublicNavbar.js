@@ -37,6 +37,12 @@ const PublicNavbar = () => {
     setExpanded(false);
   };
 
+  // Nueva función para navegar al carrito
+  const handleGoToCarrito = () => {
+    navigate("/privado/sitio/carrito");
+    setExpanded(false);
+  };
+
   return (
     <Navbar
       bg="light"
@@ -137,27 +143,18 @@ const PublicNavbar = () => {
 
           {/* Barra de búsqueda y botón de ir a app - alineados a la derecha */}
           <div className="d-flex align-items-center mt-3 mt-lg-0">
-            {/* Barra de búsqueda */}
-            <Form className="d-flex me-2" onSubmit={(e) => e.preventDefault()}>
-              <FormControl
-                type="search"
-                placeholder="¿Qué estás buscando?"
-                className="me-2 rounded-pill"
-                aria-label="Buscar"
-                style={{ borderColor: `${colors.primaryLight}50` }}
-              />
-              <Button
-                style={{
-                  backgroundColor: colors.primaryDark,
-                  borderColor: colors.primaryDark,
-                  borderRadius: "20px",
-                }}
-                type="submit"
-                className="rounded-pill px-3"
-              >
-                Buscar
-              </Button>
-            </Form>
+            {/* Botón de Carrito */}
+            <Button
+              onClick={handleGoToCarrito}
+              style={{
+                backgroundColor: colors.primaryDark,
+                borderColor: colors.primaryDark,
+                borderRadius: "20px",
+              }}
+              className="rounded-pill px-3 me-2"
+            >
+              Carrito
+            </Button>
 
             {/* Botón "Ir a app" */}
             <Button
@@ -168,7 +165,7 @@ const PublicNavbar = () => {
                 whiteSpace: "nowrap",
                 borderRadius: "20px",
               }}
-              className="ms-2 px-3"
+              className="px-3"
             >
               Ir a App
             </Button>
