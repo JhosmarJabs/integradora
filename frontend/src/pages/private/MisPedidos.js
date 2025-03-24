@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Badge, Button, Form, Pagination, Modal, ListGroup } from "react-bootstrap";
-import { colors, typography, buttons, textStyles } from "../styles/styles";
+import { colors, typography, buttons, textStyles } from "../../styles/styles";
 
 const MisPedidos = () => {
   // Estado para los pedidos y filtros

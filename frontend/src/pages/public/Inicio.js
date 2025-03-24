@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Button,
-  Row,
-  Col,
-  Card,
-  Image,
-  Spinner,
+import { Container, Button, Row, Col, Card, Image, Spinner,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Cards from "../../components/CardsV"; // Componente de tarjetas
@@ -42,36 +35,42 @@ const Inicio = () => {
         if (!response.ok) {
           throw new Error("Error al obtener los productos");
         }
+  
         const data = await response.json();
-
-        // Asegúrate de que estás almacenando un array
         const productosArray = Array.isArray(data)
           ? data
           : data.data
           ? data.data
           : [];
-        setProductos(productosArray);
-
-        // Filtrar productos destacados (con rating alto o descuento)
-        // Ordenamos por rating y tomamos solo los 3 mejores
-        const productosDestacados = productosArray
+  
+        // Agregar URL base a cada imagen
+        const productosConUrl = productosArray.map((p) => ({
+          ...p,
+          image: `${API_URL}${p.image}`,
+        }));
+  
+        setProductos(productosConUrl);
+  
+        // Productos destacados (con la URL ya corregida)
+        const productosDestacados = productosConUrl
           .filter((p) => p.rating >= 4.7 || p.discount >= 10)
           .sort((a, b) => b.rating - a.rating)
           .slice(0, 3);
+  
         setDestacados(productosDestacados);
-
-        // Extraer categorías únicas de productos
+  
+        // Categorías con imagen corregida
         const categoriasUnicas = [
-          ...new Set(productosArray.map((p) => p.category)),
+          ...new Set(productosConUrl.map((p) => p.category)),
         ];
         const categoriasData = categoriasUnicas.map((categoria) => {
-          const productosCategoria = productosArray.filter(
+          const productosCategoria = productosConUrl.filter(
             (p) => p.category === categoria
           );
           return {
             nombre: categoria,
             cantidad: productosCategoria.length,
-            imagen: productosCategoria[0]?.image, // Usamos la imagen del primer producto
+            imagen: productosCategoria[0]?.image,
           };
         });
         setCategorias(categoriasData);
@@ -79,9 +78,10 @@ const Inicio = () => {
         console.error("Error al obtener los productos:", error);
       }
     };
-
+  
     fetchProductos();
   }, []);
+  
 
   // Cargar testimonios destacados desde la API
   useEffect(() => {
@@ -987,7 +987,7 @@ const Inicio = () => {
       </section>
 
       {/* Sección de Testimonios Dinámicos */}
-      <section className="py-5" style={customStyles.testimonialsSection}>
+      {/* <section className="py-5" style={customStyles.testimonialsSection}>
         <div style={customStyles.testimonialsPattern}></div>
         <Container className="py-5" style={{ position: "relative", zIndex: 2 }}>
           <div className="text-center mb-5">
@@ -1082,7 +1082,7 @@ const Inicio = () => {
             </Button>
           </div>
         </Container>
-      </section>
+      </section> */}
 
       {/* Sección CTA (Call to Action) */}
       <section className="py-5 text-white" style={customStyles.ctaSection}>

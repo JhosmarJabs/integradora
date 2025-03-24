@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { IonIcon } from '@ionic/react';
 import { eyeOffOutline, eyeOutline, mailOutline, lockClosedOutline, callOutline } from 'ionicons/icons';
-import { Link } from 'react-router-dom'; // Importando Link para navegación
+import { Link } from 'react-router-dom';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,9 +20,20 @@ const Login = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
 
+  // Estados para errores de validación
+  const [nombreError, setNombreError] = useState('');
+  const [apellidoError, setApellidoError] = useState('');
+  const [telefonoError, setTelefonoError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [termsError, setTermsError] = useState('');
+
   // Estados para el formulario de login
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [loginEmailError, setLoginEmailError] = useState('');
+  const [loginPasswordError, setLoginPasswordError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
   // Manejo de animación al cambiar entre login y registro
@@ -41,89 +52,323 @@ const Login = () => {
       setIsLogin(!isLogin);
       setError('');
       setSuccess('');
+      // Limpiar todos los errores de validación
+      clearValidationErrors();
     }, 150);
+  };
+
+  // Función para limpiar todos los errores de validación
+  const clearValidationErrors = () => {
+    setNombreError('');
+    setApellidoError('');
+    setTelefonoError('');
+    setEmailError('');
+    setPasswordError('');
+    setConfirmPasswordError('');
+    setTermsError('');
+    setLoginEmailError('');
+    setLoginPasswordError('');
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
+  // Validar formato de email
+  const validateEmail = (email) => {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  // Validar que solo contenga letras y espacios
+  const validateOnlyLetters = (text) => {
+    const re = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+    return re.test(text);
+  };
+
+  // Validar que solo contenga números
+  const validateOnlyNumbers = (text) => {
+    const re = /^[0-9]+$/;
+    return re.test(text);
+  };
+
+  // Manipulador para entrada de teléfono (solo números)
+  const handleTelefonoChange = (e) => {
+    const value = e.target.value;
+    // Solo permitir números
+    if (value === '' || validateOnlyNumbers(value)) {
+      setTelefono(value);
+      setTelefonoError('');
+    } else {
+      setTelefonoError('Solo se permiten números');
+    }
+  };
+
+  // Manipulador para entrada de nombre (solo letras)
+  const handleNombreChange = (e) => {
+    const value = e.target.value;
+    setNombre(value);
+    if (value && !validateOnlyLetters(value)) {
+      setNombreError('Solo se permiten letras');
+    } else {
+      setNombreError('');
+    }
+  };
+
+  // Manipulador para entrada de apellido (solo letras)
+  const handleApellidoChange = (e) => {
+    const value = e.target.value;
+    setApellido(value);
+    if (value && !validateOnlyLetters(value)) {
+      setApellidoError('Solo se permiten letras');
+    } else {
+      setApellidoError('');
+    }
+  };
+
+  // Manipulador para entrada de email
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (value && !validateEmail(value)) {
+      setEmailError('Email inválido');
+    } else {
+      setEmailError('');
+    }
+  };
+
+  // Manipulador para entrada de email en login
+  const handleLoginEmailChange = (e) => {
+    const value = e.target.value;
+    setLoginEmail(value);
+    if (value && !validateEmail(value)) {
+      setLoginEmailError('Email inválido');
+    } else {
+      setLoginEmailError('');
+    }
+  };
+
+  // Validación de contraseña
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    if (confirmPassword && value !== confirmPassword) {
+      setConfirmPasswordError('Las contraseñas no coinciden');
+    } else {
+      setConfirmPasswordError('');
+    }
+    
+    // Validar fuerza de contraseña si hay valor
+    if (value) {
+      if (value.length < 8) {
+        setPasswordError('Debe tener al menos 8 caracteres');
+      } else if (!/[A-Z]/.test(value)) {
+        setPasswordError('Debe incluir al menos una mayúscula');
+      } else if (!/[0-9]/.test(value)) {
+        setPasswordError('Debe incluir al menos un número');
+      } else if (!/[^A-Za-z0-9]/.test(value)) {
+        setPasswordError('Debe incluir al menos un carácter especial');
+      } else {
+        setPasswordError('');
+      }
+    } else {
+      setPasswordError('');
+    }
+  };
+
+  // Validación de confirmación de contraseña
+  const handleConfirmPasswordChange = (e) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+    if (value !== password) {
+      setConfirmPasswordError('Las contraseñas no coinciden');
+    } else {
+      setConfirmPasswordError('');
+    }
+  };
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    let isValid = true;
+
+    // Validar email de login
+    if (!loginEmail) {
+      setLoginEmailError('El email es obligatorio');
+      isValid = false;
+    } else if (!validateEmail(loginEmail)) {
+      setLoginEmailError('Email inválido');
+      isValid = false;
+    } else {
+      setLoginEmailError('');
+    }
+
+    // Validar contraseña de login
+    if (!loginPassword) {
+      setLoginPasswordError('La contraseña es obligatoria');
+      isValid = false;
+    } else {
+      setLoginPasswordError('');
+    }
+
+    if (!isValid) {
+      return;
+    }
 
     try {
-        const response = await fetch("http://localhost:5000/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                email: loginEmail,
-                password: loginPassword
-            })
-        });
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: loginEmail,
+          password: loginPassword
+        })
+      });
 
-        const data = await response.json();
-        console.log("Respuesta completa:", data);
+      const data = await response.json();
+      console.log("Respuesta completa:", data);
 
-        if (response.ok) {
-            setSuccess('Inicio de sesión exitoso');
-            localStorage.setItem("token", data.token);
-            
-            // Corregir la obtención del rol que está dentro del objeto user
-            if (data.user && data.user.role) {
-                localStorage.setItem("role", data.user.role);
-                
-                // Determinar la redirección basada en el rol
-                const redirectUrl = data.user.role === 'admin' 
-                    ? '/admin/dashboard' 
-                    : '/privado/dashboard';
-                
-                console.log(`Rol: ${data.user.role}, Redirigiendo a: ${redirectUrl}`);
-                
-                // Redireccionar
-                window.location.href = redirectUrl;
-            } else {
-                console.error("No se recibió el rol del usuario");
-                setError("Error: No se pudo determinar el rol del usuario");
-            }
+      if (response.ok) {
+        setSuccess('Inicio de sesión exitoso');
+        localStorage.setItem("token", data.token);
+        
+        // Corregir la obtención del rol que está dentro del objeto user
+        if (data.user && data.user.role) {
+          localStorage.setItem("role", data.user.role);
+          
+          // Determinar la redirección basada en el rol
+          const redirectUrl = data.user.role === 'admin' 
+            ? '/admin/dashboard' 
+            : '/privado/dashboard';
+          
+          console.log(`Rol: ${data.user.role}, Redirigiendo a: ${redirectUrl}`);
+          
+          // Redireccionar
+          window.location.href = redirectUrl;
         } else {
-            setError(data.message || 'Error al iniciar sesión');
+          console.error("No se recibió el rol del usuario");
+          setError("Error: No se pudo determinar el rol del usuario");
         }
+      } else {
+        setError(data.message || 'Error al iniciar sesión');
+      }
     } catch (error) {
-        console.error("Error en la conexión con el servidor:", error);
-        setError('Error en la conexión con el servidor');
+      console.error("Error en la conexión con el servidor:", error);
+      setError('Error en la conexión con el servidor');
     }
-};
+  };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+    let isValid = true;
 
-    if (!nombre || !apellido || !telefono || !email || !password || !confirmPassword) {
-        setError('Por favor, completa todos los campos.');
-        return;
+    // Validar todos los campos
+    // Nombre
+    if (!nombre) {
+      setNombreError('El nombre es obligatorio');
+      isValid = false;
+    } else if (!validateOnlyLetters(nombre)) {
+      setNombreError('Solo se permiten letras');
+      isValid = false;
+    } else {
+      setNombreError('');
     }
 
-    if (password !== confirmPassword) {
-        setError('Las contraseñas no coinciden.');
-        return;
+    // Apellido
+    if (!apellido) {
+      setApellidoError('El apellido es obligatorio');
+      isValid = false;
+    } else if (!validateOnlyLetters(apellido)) {
+      setApellidoError('Solo se permiten letras');
+      isValid = false;
+    } else {
+      setApellidoError('');
+    }
+
+    // Teléfono
+    if (!telefono) {
+      setTelefonoError('El teléfono es obligatorio');
+      isValid = false;
+    } else if (!validateOnlyNumbers(telefono)) {
+      setTelefonoError('Solo se permiten números');
+      isValid = false;
+    } else if (telefono.length < 8 || telefono.length > 15) {
+      setTelefonoError('El teléfono debe tener entre 8 y 15 dígitos');
+      isValid = false;
+    } else {
+      setTelefonoError('');
+    }
+
+    // Email
+    if (!email) {
+      setEmailError('El email es obligatorio');
+      isValid = false;
+    } else if (!validateEmail(email)) {
+      setEmailError('Email inválido');
+      isValid = false;
+    } else {
+      setEmailError('');
+    }
+
+    // Contraseña
+    if (!password) {
+      setPasswordError('La contraseña es obligatoria');
+      isValid = false;
+    } else if (password.length < 8) {
+      setPasswordError('Debe tener al menos 8 caracteres');
+      isValid = false;
+    } else if (!/[A-Z]/.test(password)) {
+      setPasswordError('Debe incluir al menos una mayúscula');
+      isValid = false;
+    } else if (!/[0-9]/.test(password)) {
+      setPasswordError('Debe incluir al menos un número');
+      isValid = false;
+    } else if (!/[^A-Za-z0-9]/.test(password)) {
+      setPasswordError('Debe incluir al menos un carácter especial');
+      isValid = false;
+    } else {
+      setPasswordError('');
+    }
+
+    // Confirmar contraseña
+    if (!confirmPassword) {
+      setConfirmPasswordError('Debes confirmar la contraseña');
+      isValid = false;
+    } else if (confirmPassword !== password) {
+      setConfirmPasswordError('Las contraseñas no coinciden');
+      isValid = false;
+    } else {
+      setConfirmPasswordError('');
+    }
+
+    // Aceptar términos
+    if (!acceptTerms) {
+      setTermsError('Debes aceptar los términos y condiciones');
+      isValid = false;
+    } else {
+      setTermsError('');
+    }
+
+    if (!isValid) {
+      return;
     }
 
     try {
       const response = await fetch("http://localhost:5000/usuarios", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            name: nombre, 
-            surname: apellido,
-            phone: telefono,
-            email: email,
-            password: password,
-            role: "user",
-            status: "active"
+          name: nombre, 
+          surname: apellido,
+          phone: telefono,
+          email: email,
+          password: password,
+          role: "user",
+          status: "active"
         })
       });
 
@@ -133,14 +378,13 @@ const Login = () => {
       if (response.ok) {
         setSuccess('Registro exitoso. Ahora puedes iniciar sesión.');
         setTimeout(() => setIsLogin(true), 2000);
-          } else {
-            setError(data.message || 'Error en el registro');
-          }
+      } else {
+        setError(data.message || 'Error en el registro');
+      }
     } catch (error) {
       setError('Error al registrar el usuario. Inténtalo de nuevo.');
-      }
-    };
-
+    }
+  };
 
   // Verificación de fortaleza de contraseña
   const passwordStrength = (pass) => {
@@ -169,6 +413,14 @@ const Login = () => {
     if (strength === 2) return 'Media';
     if (strength === 3) return 'Fuerte';
     if (strength === 4) return 'Muy fuerte';
+  };
+
+  // Estilo para mensajes de error
+  const errorMessageStyle = {
+    color: '#F44336',
+    fontSize: '12px',
+    marginTop: '5px',
+    marginBottom: '0',
   };
 
   const styles = {
@@ -266,7 +518,7 @@ const Login = () => {
     inputBox: {
       position: 'relative',
       width: '100%',
-      marginBottom: '25px',
+      marginBottom: '15px',
     },
     inputLabel: {
       display: 'block',
@@ -294,6 +546,10 @@ const Login = () => {
       '&::placeholder': {
         color: 'rgba(255, 255, 255, 0.6)',
       },
+    },
+    inputError: {
+      border: '1px solid #F44336',
+      boxShadow: '0 0 0 1px #F44336',
     },
     icon: {
       position: 'absolute',
@@ -432,7 +688,6 @@ const Login = () => {
       color: 'white',
       fontSize: '16px',
     },
-    // Nuevos estilos para el texto con fondo difuminado
     welcomeContainer: {
       marginBottom: '60px',
       backgroundColor: 'rgba(0, 0, 0, 0.4)',
@@ -456,7 +711,6 @@ const Login = () => {
       marginBottom: '10px',
       lineHeight: 1.6,
     },
-    // Nuevo estilo para los contenedores de características
     featureContainer: {
       backgroundColor: 'rgba(0, 0, 0, 0.25)',
       borderRadius: '12px',
@@ -578,9 +832,10 @@ const Login = () => {
                         type="email"
                         placeholder="Ingresa tu correo electrónico"
                         value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
-                        style={styles.input}
+                        onChange={handleLoginEmailChange}
+                        style={{...styles.input, ...(loginEmailError ? styles.inputError : {})}}
                       />
+                      {loginEmailError && <p style={errorMessageStyle}>{loginEmailError}</p>}
                     </div>
                     
                     <div style={styles.inputBox}>
@@ -593,12 +848,16 @@ const Login = () => {
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Ingresa tu contraseña"
                         value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
-                        style={styles.input}
+                        onChange={(e) => {
+                          setLoginPassword(e.target.value);
+                          setLoginPasswordError('');
+                        }}
+                        style={{...styles.input, ...(loginPasswordError ? styles.inputError : {})}}
                       />
                       <span style={{...styles.togglePassword, top: 'calc(50% + 10px)'}} onClick={togglePasswordVisibility}>
                         <IonIcon icon={showPassword ? eyeOutline : eyeOffOutline} />
                       </span>
+                      {loginPasswordError && <p style={errorMessageStyle}>{loginPasswordError}</p>}
                     </div>
                     
                     <div style={{
@@ -670,9 +929,10 @@ const Login = () => {
                           type="text"
                           placeholder="Tu nombre"
                           value={nombre}
-                          onChange={(e) => setNombre(e.target.value)}
-                          style={styles.input}
+                          onChange={handleNombreChange}
+                          style={{...styles.input, ...(nombreError ? styles.inputError : {})}}
                         />
+                        {nombreError && <p style={errorMessageStyle}>{nombreError}</p>}
                       </div>
                       <div style={styles.inputBox}>
                         <label htmlFor="reg-apellido" style={styles.inputLabel}>Apellido</label>
@@ -681,9 +941,10 @@ const Login = () => {
                           type="text"
                           placeholder="Tu apellido"
                           value={apellido}
-                          onChange={(e) => setApellido(e.target.value)}
-                          style={styles.input}
+                          onChange={handleApellidoChange}
+                          style={{...styles.input, ...(apellidoError ? styles.inputError : {})}}
                         />
+                        {apellidoError && <p style={errorMessageStyle}>{apellidoError}</p>}
                       </div>
                     </div>
                     
@@ -697,9 +958,10 @@ const Login = () => {
                         type="tel"
                         placeholder="Tu número telefónico"
                         value={telefono}
-                        onChange={(e) => setTelefono(e.target.value)}
-                        style={styles.input}
+                        onChange={handleTelefonoChange}
+                        style={{...styles.input, ...(telefonoError ? styles.inputError : {})}}
                       />
+                      {telefonoError && <p style={errorMessageStyle}>{telefonoError}</p>}
                     </div>
                     
                     <div style={styles.inputBox}>
@@ -712,9 +974,10 @@ const Login = () => {
                         type="email"
                         placeholder="Tu correo electrónico"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        style={styles.input}
+                        onChange={handleEmailChange}
+                        style={{...styles.input, ...(emailError ? styles.inputError : {})}}
                       />
+                      {emailError && <p style={errorMessageStyle}>{emailError}</p>}
                     </div>
                     
                     <div style={styles.inputBox}>
@@ -727,8 +990,8 @@ const Login = () => {
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Crea una contraseña segura"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        style={styles.input}
+                        onChange={handlePasswordChange}
+                        style={{...styles.input, ...(passwordError ? styles.inputError : {})}}
                       />
                       <span style={{...styles.togglePassword, top: 'calc(50% + 10px)'}} onClick={togglePasswordVisibility}>
                         <IonIcon icon={showPassword ? eyeOutline : eyeOffOutline} />
@@ -743,6 +1006,7 @@ const Login = () => {
                           </div>
                         </>
                       )}
+                      {passwordError && <p style={errorMessageStyle}>{passwordError}</p>}
                     </div>
                     
                     <div style={styles.inputBox}>
@@ -755,12 +1019,13 @@ const Login = () => {
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Confirma tu contraseña"
                         value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        style={styles.input}
+                        onChange={handleConfirmPasswordChange}
+                        style={{...styles.input, ...(confirmPasswordError ? styles.inputError : {})}}
                       />
                       <span style={{...styles.togglePassword, top: 'calc(50% + 10px)'}} onClick={togglePasswordVisibility}>
                         <IonIcon icon={showPassword ? eyeOutline : eyeOffOutline} />
                       </span>
+                      {confirmPasswordError && <p style={errorMessageStyle}>{confirmPasswordError}</p>}
                     </div>
                     
                     <div style={{
@@ -772,10 +1037,14 @@ const Login = () => {
                           type="checkbox" 
                           style={styles.checkbox}
                           checked={acceptTerms}
-                          onChange={() => setAcceptTerms(!acceptTerms)}
+                          onChange={() => {
+                            setAcceptTerms(!acceptTerms);
+                            setTermsError('');
+                          }}
                         /> 
                         Acepto las <Link to="/politicas#cliente" style={styles.highlight}>Políticas de Cliente</Link> y las <Link to="/politicas#privacidad" style={styles.highlight}>Políticas de Privacidad</Link>
                       </label>
+                      {termsError && <p style={errorMessageStyle}>{termsError}</p>}
                     </div>
                     
                     <Button type="submit" style={styles.button}>

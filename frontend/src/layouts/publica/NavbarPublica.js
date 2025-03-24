@@ -104,7 +104,7 @@ const NavbarPublica = () => {
               </div>
             </>
           ) : (
-            // Menú para áreas públicas - original del primer código
+            // Menú para áreas públicas
             <>
               {/* Enlaces principales - centrados */}
               <Nav className="mx-auto">
@@ -145,6 +145,38 @@ const NavbarPublica = () => {
                   ))}
                 </NavDropdown>
                 
+                {/* Menú desplegable de Nosotros */}
+                <NavDropdown 
+                  title="Nosotros" 
+                  id="about-dropdown"
+                  className="mx-2"
+                  style={{ color: colors.primaryMedium }}
+                >
+                  <NavDropdown.Item 
+                    as={Link} 
+                    to="/nosotros" 
+                    onClick={() => setExpanded(false)}
+                  >
+                    Nosotros
+                  </NavDropdown.Item>
+                  
+                  <NavDropdown.Item 
+                    as={Link} 
+                    to="/politicas" 
+                    onClick={() => setExpanded(false)}
+                  >
+                    Políticas
+                  </NavDropdown.Item>
+                  
+                  <NavDropdown.Item 
+                    as={Link} 
+                    to="/contacto" 
+                    onClick={() => setExpanded(false)}
+                  >
+                    Contacto
+                  </NavDropdown.Item>
+                </NavDropdown>
+                
                 <Nav.Link 
                   as={Link} 
                   to="/servicios" 
@@ -153,26 +185,6 @@ const NavbarPublica = () => {
                   style={{ color: colors.primaryMedium }}
                 >
                   Servicios
-                </Nav.Link>
-                
-                <Nav.Link 
-                  as={Link} 
-                  to="/nosotros" 
-                  onClick={() => setExpanded(false)}
-                  className="mx-2"
-                  style={{ color: colors.primaryMedium }}
-                >
-                  Nosotros
-                </Nav.Link>
-                
-                <Nav.Link 
-                  as={Link} 
-                  to="/contacto" 
-                  onClick={() => setExpanded(false)}
-                  className="mx-2"
-                  style={{ color: colors.primaryMedium }}
-                >
-                  Contacto
                 </Nav.Link>
               </Nav>
 
@@ -202,4 +214,4 @@ const NavbarPublica = () => {
   );
 };
 
-export default NavbarPublica;;
+export default NavbarPublica;

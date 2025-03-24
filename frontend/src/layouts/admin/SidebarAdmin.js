@@ -326,7 +326,7 @@ const SidebarAdmin = ({ collapsed, onToggle }) => {
               {expandedMenus.iot ? <FaChevronDown size={12} /> : <FaChevronRight size={12} />}
             </span>
           </div>
-          <div style={{
+          {/* <div style={{
             ...styles.submenuContainer,
             ...(expandedMenus.iot ? styles.submenuExpanded : {})
           }}>
@@ -364,7 +364,7 @@ const SidebarAdmin = ({ collapsed, onToggle }) => {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div> */}
         </li>
         
         {/* Información */}

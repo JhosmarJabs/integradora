@@ -17,6 +17,7 @@ import IoTVinculacion from "../pages/admin/iot/IoTVinculacion.js";
 import IoTAltas from "../pages/admin/iot/IoTAltas.js";
 import IoTBajas from "../pages/admin/iot/IoTBajas.js";
 import IoTUsuarios from "../pages/admin/iot/IoTUsuarios.js";
+import IoTTest from "../pages/admin/iot/IoTTest.js";
 
 import InformacionModificacion from "../pages/admin/informacion/InformacionModificacion.js";
 import InformacionVista from "../pages/admin/informacion/InformacionVista.js";
@@ -49,6 +50,7 @@ const adminRoutes = (
     <Route path="iot/altas" element={<IoTAltas />} />
     <Route path="iot/bajas" element={<IoTBajas />} />
     <Route path="iot/usuarios" element={<IoTUsuarios />} />
+    <Route path="iot/test" element={<IoTTest />} />
     
     {/* Información */}
     <Route path="informacion/modificacion" element={<InformacionModificacion />} />
