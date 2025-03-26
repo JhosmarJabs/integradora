@@ -1,32 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Form, Button, Badge, Nav, Tab } from 'react-bootstrap';
 import { colors, typography, textStyles, buttons } from '../../styles/styles';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+
 
 const Perfil = () => {
-  // Estados para los datos del usuario
-  const [userData, setUserData] = useState({
-    id: 'USR-1001',
-    nombre: 'Juan',
-    apellido: 'Pérez',
-    email: 'juan.perez@ejemplo.com',
-    telefono: '+34 612 345 678',
-    fechaRegistro: '2024-01-15',
-    direccion: 'Calle Principal 123',
-    ciudad: 'Madrid',
-    codigoPostal: '28001',
-    pais: 'España',
-    idioma: 'Español',
-    avatar: null,
-    vinculacionesIoT: [
-      { id: 'VINC-001', plataforma: 'Amazon Alexa', estado: 'activo', fechaVinculacion: '2024-02-10' },
-      { id: 'VINC-002', plataforma: 'Google Home', estado: 'activo', fechaVinculacion: '2024-02-15' },
-      { id: 'VINC-003', plataforma: 'Apple HomeKit', estado: 'inactivo', fechaVinculacion: '2024-03-05' }
-    ]
-  });
-  
+  const [userData, setUserData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({...userData});
+  const [formData, setFormData] = useState({});
   const [activeTab, setActiveTab] = useState('vista-general');
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        const decoded = jwtDecode(token);
+        const userId = decoded.id;
+
+        const response = await fetch(`http://localhost:5000/usuarios/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) throw new Error('Error al obtener los datos del usuario');
+
+        const data = await response.json();
+        const perfilUsuario = {
+          id: data._id,
+          nombre: data.name,
+          apellido: data.surname,
+          email: data.email,
+          telefono: data.phone,
+          fechaRegistro: new Date(data.date).toISOString().split('T')[0],
+          direccion: data.direccion || '',
+          ciudad: data.ciudad || '',
+          codigoPostal: data.codigoPostal || '',
+          pais: data.pais || '',
+          idioma: data.idioma || 'Español',
+          avatar: null,
+          vinculacionesIoT: data.vinculacionesIoT || [],
+        };
+
+        setUserData(perfilUsuario);
+        setFormData(perfilUsuario);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   
   // Función para manejar cambios en el formulario
   const handleChange = (e) => {
@@ -38,12 +66,46 @@ const Perfil = () => {
   };
   
   // Función para guardar cambios
-  const handleSave = () => {
-    setUserData({...formData});
-    setIsEditing(false);
-    // En una aplicación real, aquí enviaríamos los datos al backend
-    alert('Información actualizada correctamente');
+  const handleSave = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+  
+    try {
+      const decoded = jwtDecode(token);
+      const userId = decoded.id;
+  
+      const response = await fetch(`http://localhost:5000/usuarios/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: formData.nombre,
+          surname: formData.apellido,
+          phone: formData.telefono,
+          email: formData.email,
+          direccion: formData.direccion,
+          ciudad: formData.ciudad,
+          codigoPostal: formData.codigoPostal,
+          pais: formData.pais,
+          idioma: formData.idioma,
+        }),
+      });
+  
+      if (!response.ok) throw new Error('Error al actualizar el perfil');
+  
+      const dataActualizada = await response.json();
+      setUserData({ ...formData });
+      setIsEditing(false);
+      alert('Información actualizada correctamente');
+    } catch (error) {
+      console.error('Error al guardar cambios:', error);
+      alert('Ocurrió un error al guardar los cambios');
+    }
   };
+  
+  
   
   // Función para cancelar edición
   const handleCancel = () => {
@@ -93,6 +155,10 @@ const Perfil = () => {
     alert('Estado de vinculación actualizado correctamente');
   };
 
+  if (!userData) {
+    return <div>Cargando perfil...</div>; // o un spinner si prefieres
+  }
+  
   return (
     <div>
       <h2 style={textStyles.title}>Perfil de Usuario</h2>

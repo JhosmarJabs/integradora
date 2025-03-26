@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Navbar, Button, Dropdown, Badge } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { colors, typography } from '../../styles/styles';
+import { jwtDecode } from 'jwt-decode'; // Asegúrate de instalar jwt-decode
 import { 
   FaUser,
   FaBell, 
@@ -14,6 +15,11 @@ import {
 const NavbarPrivada = ({ toggleSidebar, collapsed }) => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [userData, setUserData] = useState({
+    name: 'Usuario',
+    surname: '',
+    role: 'Cliente'
+  });
   
   // Datos de ejemplo para notificaciones
   const notifications = [
@@ -22,12 +28,54 @@ const NavbarPrivada = ({ toggleSidebar, collapsed }) => {
     { id: 3, text: "Recordatorio: Mantenimiento programado", time: "Hace 1 hora", read: true },
   ];
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+  
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        
+        // Mostrar el token completo para depuración
+        console.log('Token completo decodificado:', decoded);
+        
+        // IMPORTANTE: Usamos directamente los datos del token decodificado
+        setUserData({
+          id: decoded.id, // 👈 aquí se guarda
+          name: decoded.name || 'Usuario',
+          surname: decoded.surname || '',
+          role: decoded.role || 'Cliente'
+        });
+        
+        // Log para verificar que estamos configurando los datos correctamente
+        console.log('Datos que se establecen en el estado:', {
+          id: decoded.id || 'id x',
+          name: decoded.name || 'Usuario',
+          surname: decoded.surname || '',
+          role: decoded.role || 'Cliente'
+        });
+        
+      } catch (error) {
+        console.error("Error al decodificar el token:", error);
+        console.log("Token inválido o mal formateado");
+        handleLogout(); // Cierra sesión si el token es inválido
+      }
+    } else {
+      console.log("No se encontró token de autenticación");
+    }
+  }, []);
+  
+  // Para verificar después de la renderización que los datos se muestran correctamente
+  useEffect(() => {
+    console.log('Datos de usuario mostrados en la interfaz:', userData);
+  }, [userData]);
+
   const unreadCount = notifications.filter(n => !n.read).length;
   
   // Manejo del cierre de sesión
   const handleLogout = () => {
-    // Aquí iría la lógica para cerrar sesión
+    // Limpiar token y redirigir
     localStorage.removeItem("token");
+    console.log("Sesión cerrada");
     navigate('/');
   };
 
@@ -45,6 +93,27 @@ const NavbarPrivada = ({ toggleSidebar, collapsed }) => {
             <FaBars />
           </Button>
         )}
+        
+        {/* Información del usuario visible en la barra de navegación */}
+        <div className="d-none d-md-flex align-items-center ms-2">
+          <span style={{ 
+            fontWeight: 'bold', 
+            color: colors.primaryDark,
+            fontSize: '14px'
+          }}>
+            Bienvenido, {userData.name} {userData.surname}
+          </span>
+          <span style={{ 
+            marginLeft: '8px',
+            padding: '3px 8px',
+            backgroundColor: colors.primaryLight,
+            color: colors.white,
+            borderRadius: '4px',
+            fontSize: '12px'
+          }}>
+            {userData.role}
+          </span>
+        </div>
         
         {/* Espacio flexible para empujar elementos a la derecha */}
         <div className="ms-auto d-flex align-items-center">
@@ -102,67 +171,34 @@ const NavbarPrivada = ({ toggleSidebar, collapsed }) => {
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <div style={{ 
-                  padding: '15px',
-                  borderBottom: '1px solid #eee',
-                  backgroundColor: colors.primaryDark,
-                  color: colors.white,
-                }}>
+                <div className="p-3 border-bottom">
                   <div className="d-flex justify-content-between align-items-center">
                     <h6 className="m-0">Notificaciones</h6>
-                    <span style={{ fontSize: '12px', cursor: 'pointer' }}>
-                      Marcar todas como leídas
-                    </span>
+                    <Badge bg="danger" pill>{unreadCount}</Badge>
                   </div>
                 </div>
-                
-                <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
+                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
                   {notifications.map(notification => (
                     <div 
                       key={notification.id} 
-                      style={{
-                        padding: '12px 15px',
-                        borderBottom: '1px solid #eee',
-                        backgroundColor: notification.read ? 'white' : `${colors.primaryLight}10`,
-                        cursor: 'pointer'
+                      className="p-3 border-bottom" 
+                      style={{ 
+                        backgroundColor: notification.read ? '#fff' : 'rgba(13, 110, 253, 0.05)',
+                        cursor: 'pointer' 
                       }}
                     >
-                      <div className="d-flex">
-                        <div style={{ 
-                          minWidth: '8px', 
-                          backgroundColor: notification.read ? 'transparent' : colors.primaryMedium,
-                          borderRadius: '4px',
-                          marginRight: '10px'
-                        }}></div>
-                        <div>
-                          <p style={{ 
-                            margin: '0 0 5px 0', 
-                            fontSize: '14px',
-                            color: colors.primaryDark
-                          }}>
-                            {notification.text}
-                          </p>
-                          <span style={{ 
-                            fontSize: '12px', 
-                            color: colors.accent
-                          }}>
-                            {notification.time}
-                          </span>
-                        </div>
+                      <div className="small mb-1">{notification.text}</div>
+                      <div className="d-flex justify-content-between">
+                        <small className="text-muted">{notification.time}</small>
+                        {!notification.read && (
+                          <small className="text-primary">Nueva</small>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
-                
-                <div style={{ 
-                  padding: '10px', 
-                  textAlign: 'center', 
-                  fontSize: '14px',
-                  color: colors.primaryMedium,
-                  cursor: 'pointer',
-                  borderTop: '1px solid #eee',
-                }}>
-                  Ver todas las notificaciones
+                <div className="p-2 text-center">
+                  <Button variant="link" size="sm">Ver todas</Button>
                 </div>
               </div>
             )}
@@ -193,7 +229,7 @@ const NavbarPrivada = ({ toggleSidebar, collapsed }) => {
                 border: `2px solid ${colors.white}`,
                 boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
               }}>
-                <FaUser />
+                {userData.name.charAt(0) + (userData.surname ? userData.surname.charAt(0) : '')}
               </div>
               <div className="d-none d-md-block ms-2 me-1">
                 <div style={{ 
@@ -202,10 +238,10 @@ const NavbarPrivada = ({ toggleSidebar, collapsed }) => {
                   color: colors.primaryDark
                 }}>
                   <div style={{ fontWeight: 'bold', fontSize: '14px' }}>
-                    Usuario Demo
+                    {`${userData.name} ${userData.surname}`.trim()}
                   </div>
                   <div style={{ fontSize: '12px', color: colors.accent }}>
-                    Cliente
+                    {userData.role}
                   </div>
                 </div>
               </div>
@@ -214,10 +250,10 @@ const NavbarPrivada = ({ toggleSidebar, collapsed }) => {
             <Dropdown.Menu style={{ minWidth: '200px', marginTop: '8px' }}>
               <div className="px-3 py-2 text-center d-md-none border-bottom">
                 <div style={{ fontWeight: 'bold', color: colors.primaryDark }}>
-                  Usuario Demo
+                  {`${userData.name} ${userData.surname}`.trim()}
                 </div>
                 <div style={{ fontSize: '12px', color: colors.accent }}>
-                  Cliente
+                  {userData.role}
                 </div>
               </div>
               

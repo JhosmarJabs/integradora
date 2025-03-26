@@ -356,7 +356,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/usuarios", {
+      const response = await fetch("http://localhost:5000/usuarios/registro", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -367,7 +367,7 @@ const Login = () => {
           phone: telefono,
           email: email,
           password: password,
-          role: "user",
+          role: "cliente",
           status: "active"
         })
       });
