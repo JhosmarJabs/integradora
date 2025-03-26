@@ -3,6 +3,7 @@ import { Row, Col, Card, Form, Button, Badge, Nav, Tab } from 'react-bootstrap';
 import { colors, typography, textStyles, buttons } from '../../styles/styles';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
+import { API_URL } from "../../config"; // Asegúrate de importar la URL de la API
 
 
 const Perfil = () => {
@@ -20,7 +21,7 @@ const Perfil = () => {
         const decoded = jwtDecode(token);
         const userId = decoded.id;
 
-        const response = await fetch(`http://localhost:5000/usuarios/${userId}`, {
+        const response = await fetch(`${API_URL}/usuarios/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -74,7 +75,7 @@ const Perfil = () => {
       const decoded = jwtDecode(token);
       const userId = decoded.id;
   
-      const response = await fetch(`http://localhost:5000/usuarios/${userId}`, {
+      const response = await fetch(`${API_URL}usuarios/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

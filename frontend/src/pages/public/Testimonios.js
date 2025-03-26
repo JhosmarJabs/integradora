@@ -1,19 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Button,
-  Form,
-  Spinner,
-  Badge,
-  Alert,
-  Image,
-} from "react-bootstrap";
-import { colors, typography, layout } from "../../styles/styles";
-import { API_URL } from "../../config";
+import { Container, Row, Col, Card, Button, Form, Spinner, Badge, Alert, Image} from "react-bootstrap";
+import { colors } from "../../styles/styles";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config";
 
 const Testimonios = () => {
   const navigate = useNavigate();
@@ -35,7 +24,7 @@ const Testimonios = () => {
 
   // Verificar si el usuario está autenticado
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState(null);
+  const [setUserData] = useState(null);
 
   // Verificar autenticación al cargar el componente
   useEffect(() => {

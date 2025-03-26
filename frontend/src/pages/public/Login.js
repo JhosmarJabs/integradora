@@ -3,6 +3,7 @@ import { Form, Button } from 'react-bootstrap';
 import { IonIcon } from '@ionic/react';
 import { eyeOffOutline, eyeOutline, mailOutline, lockClosedOutline, callOutline } from 'ionicons/icons';
 import { Link } from 'react-router-dom';
+import { API_URL } from "../../config"; // Asegúrate de importar la URL de la API
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -215,7 +216,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -356,7 +357,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/usuarios/registro", {
+      const response = await fetch(`${API_URL}/usuarios/registro`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -431,7 +432,7 @@ const Login = () => {
       justifyContent: 'center',
       alignItems: 'center',
       background: `linear-gradient(135deg, rgba(13, 27, 42, 0.95) 0%, rgba(27, 38, 59, 0.95) 100%)`,
-      backgroundImage: `url("http://localhost:5000/uploads/backgrounds.jpg")`,
+      backgroundImage: `url(${API_URL}/uploads/backgrounds.jpg)`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundBlendMode: 'overlay',

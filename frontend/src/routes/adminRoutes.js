@@ -8,15 +8,8 @@ import AdminLayout from "../layouts/AdminLayout.js";
 import Dashboard from "../pages/admin/Dashboard.js";
 // Componentes de Usuarios
 import UsuariosGeneral from "../pages/admin/usuarios/UsuariosGeneral.js";
-import UsuariosAltas from "../pages/admin/usuarios/UsuariosAltas.js";
-import UsuariosBajas from "../pages/admin/usuarios/UsuariosBajas.js";
-import UsuariosCambios from "../pages/admin/usuarios/UsuariosCambios.js";
 
 import ProductosGeneral from "../pages/admin/iot/ProductosGeneral.js";
-import IoTVinculacion from "../pages/admin/iot/IoTVinculacion.js";
-import IoTAltas from "../pages/admin/iot/IoTAltas.js";
-import IoTBajas from "../pages/admin/iot/IoTBajas.js";
-import IoTUsuarios from "../pages/admin/iot/IoTUsuarios.js";
 import IoTTest from "../pages/admin/iot/IoTTest.js";
 
 import InformacionModificacion from "../pages/admin/informacion/InformacionModificacion.js";
@@ -40,16 +33,9 @@ const adminRoutes = (
     
     {/* Usuarios */}
     <Route path="usuarios" element={<UsuariosGeneral />} />
-    <Route path="usuarios/altas" element={<UsuariosAltas />} />
-    <Route path="usuarios/bajas" element={<UsuariosBajas />} />
-    <Route path="usuarios/cambios" element={<UsuariosCambios />} />
     
     {/* IoT */}
     <Route path="productos" element={<ProductosGeneral />} />
-    <Route path="iot/vinculacion" element={<IoTVinculacion />} />
-    <Route path="iot/altas" element={<IoTAltas />} />
-    <Route path="iot/bajas" element={<IoTBajas />} />
-    <Route path="iot/usuarios" element={<IoTUsuarios />} />
     <Route path="iot/test" element={<IoTTest />} />
     
     {/* Información */}

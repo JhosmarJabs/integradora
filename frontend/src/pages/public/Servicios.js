@@ -1,15 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { colors, textStyles, layout, buttons } from "../../styles/styles";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Image,
-  Spinner,
-  Alert,
-  Button,
-} from "react-bootstrap";
+import { Container, Row, Col, Card, Image, Spinner, Alert, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../../config";
 

@@ -1,6 +1,7 @@
 // src/components/ProtectedRoute.jsx
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { API_URL } from "../config"; // Asegúrate de importar la URL de la API
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const [loading, setLoading] = useState(true);
@@ -17,7 +18,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/verify-session', {
+        const response = await fetch(`${API_URL}/verify-session`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

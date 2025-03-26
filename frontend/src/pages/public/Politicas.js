@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Accordion,
-  Spinner,
-  Alert,
-  Button,
-} from "react-bootstrap";
+import {Container,Row,Col,Card,Accordion,Spinner,Alert,Button} from "react-bootstrap";
 import { colors, textStyles, typography } from "../../styles/styles";
 import { API_URL } from "../../config";
 

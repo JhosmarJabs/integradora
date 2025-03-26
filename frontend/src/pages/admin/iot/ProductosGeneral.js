@@ -1,35 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Table,
-  Button,
-  Form,
-  Modal,
-  Badge,
-  Alert,
-  Spinner,
-  InputGroup,
-  Tabs,
-  Tab,
-} from "react-bootstrap";
-import {
-  FaPlus,
-  FaEdit,
-  FaTrash,
-  FaSearch,
-  FaFilter,
-  FaSort,
-  FaInfoCircle,
-  FaBarcode,
-  FaBox,
-  FaTag,
-  FaMoneyBillWave,
-  FaDollarSign,
-  FaSave,
-} from "react-icons/fa";
+import {Container,Row,Col,Card,Table,Button,Form,Modal,Badge,Alert,Spinner,InputGroup,Tabs,Tab} from "react-bootstrap";
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter, FaInfoCircle, FaBox, FaDollarSign, FaSave} from "react-icons/fa";
 import { colors, textStyles } from "../../../styles/styles";
 import axios from "axios";
 import { API_URL } from "../../../config";

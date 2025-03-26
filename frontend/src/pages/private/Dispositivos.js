@@ -1,19 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  Row,
-  Col,
-  Card,
-  Button,
-  Tabs,
-  Tab
-} from "react-bootstrap";
-
-import {
-  colors,
-  typography,
-  textStyles,
-  buttons,
-} from "../../styles/styles";
+import { Row, Col, Card, Button, Tabs, Tab} from "react-bootstrap";
+import { colors, typography, textStyles, buttons} from "../../styles/styles";
 import DispositivosList from "../../components/DispositivosList.js";
 import DispositivoDetail from "../../components/DispositivoDetail.js";
 
